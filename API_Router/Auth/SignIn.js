@@ -12,7 +12,7 @@ SignIn.post("/sign_in", async (req, res, next) => {
           return res.status(401).json({ result: false, message: info.message });
         }
         // Đăng nhập thành công
-        return res.status(200).json({result: false, message: "Đăng nhập thành công", user });
+        return res.status(200).json({result: true, message: "Đăng nhập thành công", user });
       })(req, res, next);
 });
 

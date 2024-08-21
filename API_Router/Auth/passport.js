@@ -9,10 +9,7 @@ passport.use(
         usernameField: 'email', // Sử dụng email làm username
         passwordField: 'password' // Trường mật khẩu
       },async function verify(email, password, cb) {
-        console.log(email);
-        console.log(password);
-        
-        
+
       try {
         //kiểm tra xem có email ko
         const result = await db.query("SELECT * FROM users WHERE email = $1 ", [

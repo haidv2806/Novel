@@ -4,12 +4,12 @@ import passport from "../Auth/passport.js";
 
 const Avatar = express.Router();
 
-Avatar.post("/avatar", async (res, req) => {
+Avatar.post("/avatar", async (req, res, next) => {
     const picture = req.body.picture
     const email = req.body.email
 
-    //đăng nhập
-    await passport.authenticate("local", async (err, user, info) => {
+    passport.authenticate("local", async (err, user, info) => {
+        
         if (err) {
             return res.status(500).json({ result: false, error: err.message });
         }
@@ -25,12 +25,12 @@ Avatar.post("/avatar", async (res, req) => {
             );
 
             return res.json({ result: true, message: "Thay ảnh đại diện thành công", data: result.rows[0] });
+
         } catch (updateErr) {
             return res.status(500).json({ result: false, message: "lỗi thay ảnh đại diện", error: updateErr.message });
         }
-
-    })(req, res);
-})
+    })(req, res, next);
+});
 
 export default Avatar
 
