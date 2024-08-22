@@ -1,43 +1,27 @@
 import express, { json, response } from "express";
-import db from "../database.js";
 import passport from "../Auth/passport.js";
+import User from "../../Model/User.js";
 
 const Avatar = express.Router();
 
-Avatar.post("/avatar", async (req, res, next) => {
-    const picture = req.body.picture
-    const email = req.body.email
+Avatar.post("/avatar", passport.authenticate('jwt', { session: false, optional: false }),
+  async (req, res, cb) => {
+    try {
+      const picture = req.body.picture
+      const result = await User.updateNewAvatar(req.user.userid, picture)
 
-    passport.authenticate("local", async (err, user, info) => {
-        
-        if (err) {
-            return res.status(500).json({ result: false, error: err.message });
-        }
-        if (!user) {
-            return res.status(401).json({ result: false, message: info.message });
-        }
-        // Đăng nhập thành công
-        // set avatar mới
-        try {
-            const result = await db.query(
-                "UPDATE users SET picture = $1 WHERE email = $2 RETURNING *",
-                [picture, email]
-            );
-
-            return res.json({ result: true, message: "Thay ảnh đại diện thành công", data: result.rows[0] });
-
-        } catch (updateErr) {
-            return res.status(500).json({ result: false, message: "lỗi thay ảnh đại diện", error: updateErr.message });
-        }
-    })(req, res, next);
-});
+      res.status(200).json({ result: true, message: 'Avatar uploaded successfully', user: result });
+    } catch (error) {
+      return res.status(500).json({ result: false, message: "Không thay đổi avatar" })
+    }
+  });
 
 export default Avatar
 
 // Sử dụng
+//truyền dữ liệu và header:
+//Authorization: Bearer <AuthToken>
 // truyền dữ liệu vào body:
 // {
-//   "email": "user@example.com",
-//   "password": "password123"
 //   "picture": base64
 // }

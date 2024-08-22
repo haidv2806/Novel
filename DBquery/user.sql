@@ -3,7 +3,7 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL,
     displayname VARCHAR(50) NOT NULL,
-    picture TEXT NOT NULL
+    avatar TEXT NOT NULL
 )
 
--- picture là dạng base 64
+-- avatar là dạng base 64

@@ -2,8 +2,8 @@ import express, { json, response} from "express";
 import passport from "./passport.js";
 const SignIn = express.Router();
 
-SignIn.post("/sign_in", async (req, res, next) => {
-    passport.authenticate("local", (err, token, user, info) => {
+SignIn.post("/sign_in", async (req, res, cb) => {
+    passport.authenticate("login", (err, token, user, info) => {
         if (err) {
           return res.status(500).json({ result: false, error: err.message });
         }
@@ -11,8 +11,8 @@ SignIn.post("/sign_in", async (req, res, next) => {
           return res.status(401).json({ result: false, message: info.message });
         }
         // Đăng nhập thành công  
-        res.json({ result: true, message: 'Authenticated', token: token, user });
-      })(req, res, next);
+        res.json({ result: true, message: 'Authenticated', token: `Bearer ${token}`, user });
+      })(req, res, cb);
 });
 
 export default SignIn

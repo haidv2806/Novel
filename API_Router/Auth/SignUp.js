@@ -8,10 +8,9 @@ env.config();
 
 const SignUp = express.Router();
 
-SignUp.post("/sign_up", async (req, res) => {
+SignUp.post("/sign_up", async (req, res, cb) => {
   const email = req.body.email;
   const password = req.body.password;
-
   try {
     // kiểm tra xem email đã được dùng chưa
     const checkEmail = await User.findByEmail(email)
