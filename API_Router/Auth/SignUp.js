@@ -1,5 +1,4 @@
 import express, { json, response} from "express";
-import db from "../database.js";
 import bcrypt from "bcrypt"
 import env from "dotenv";
 import User from "../../Model/User.js";

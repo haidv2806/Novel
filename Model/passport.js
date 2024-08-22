@@ -1,16 +1,14 @@
 import bcrypt from "bcrypt";
-import db from "../database.js";
 import passport from "passport";
 import { Strategy } from "passport-local";
-import AuthTokenStrategy from "passport-auth-token"
-import AccessToken from "../../Model/AccessToken.js";
-import User from "../../Model/User.js";
+import User from "./User.js";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import jwt from 'jsonwebtoken';
 import env from "dotenv";
 
 env.config();
 const secretOrKey = process.env.SECRET_AUTH_TOKEN_KEY
+const expiresToken = process.env.EXPIRES_TOKEN
 
 passport.use(
   "login",
@@ -32,7 +30,7 @@ passport.use(
           } else {
             if (valid) {
               const payload = { userid: checkEmail.userid, email: checkEmail.email };
-              const token = jwt.sign(payload, secretOrKey, { expiresIn: '1h' });
+              const token = jwt.sign(payload, secretOrKey, { expiresIn: expiresToken });
               return cb(null, token ,checkEmail);
             } else {
               return cb(null, false);

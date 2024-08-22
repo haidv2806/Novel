@@ -1,5 +1,5 @@
 import express, { json, response} from "express";
-import passport from "./passport.js";
+import passport from "../../Model/passport.js";
 const SignIn = express.Router();
 
 SignIn.post("/sign_in", async (req, res, cb) => {
