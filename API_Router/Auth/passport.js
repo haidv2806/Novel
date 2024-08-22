@@ -6,9 +6,11 @@ import AuthTokenStrategy from "passport-auth-token"
 import AccessToken from "../../Model/AccessToken.js";
 import User from "../../Model/User.js";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
+import jwt from 'jsonwebtoken';
 import env from "dotenv";
 
 env.config();
+const secretOrKey = process.env.SECRET_AUTH_TOKEN_KEY
 
 passport.use(
   "local",
@@ -31,7 +33,9 @@ passport.use(
             return cb(err);
           } else {
             if (valid) {
-              return cb(null, user);
+              const payload = { id: user.id, username: user.username };
+              const token = jwt.sign(payload, secretOrKey, { expiresIn: '1h' });
+              return cb(null, token ,user);
             } else {
               return cb(null, false);
             }
@@ -75,7 +79,7 @@ passport.use('authtoken', new AuthTokenStrategy(
 // JWT strategy
 const opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.SECRET_AUTH_TOKEN_KEY, // Replace with your secret key
+  secretOrKey: secretOrKey, // Replace with your secret key
 };
 
 passport.use(new JwtStrategy(opts, async (jwt_payload, done) => {

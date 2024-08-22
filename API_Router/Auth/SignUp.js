@@ -2,6 +2,7 @@ import express, { json, response} from "express";
 import db from "../database.js";
 import bcrypt from "bcrypt"
 import env from "dotenv";
+import User from "../../Model/User.js";
 
 env.config();
 
@@ -13,24 +14,19 @@ SignUp.post("/sign_up", async (req, res) => {
 
   try {
     // kiểm tra xem email đã được dùng chưa
-    const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [email]);
-
-    if (checkResult.rows.length > 0) {
-      return res.json({ result: false, message: "Email đã tồn tại, vui lòng đăng nhập." });
+    const checkEmail = await User.findByEmail(email)
+    
+    if (checkEmail) {
+      return res.status(401).json({ result: false, message: "Email đã tồn tại, vui lòng đăng nhập." });
 
     } else {
         bcrypt.hash(password, 10, async (err, hash) => {
-
           if (err) {
             return res.status(500).json({ result: false, message: "Lỗi khi mã hóa mật khẩu.", error: err });
           } else {
-            const result = await db.query(
-              "INSERT INTO users (email, password, displayname, picture) VALUES ($1, $2, $3, $4) RETURNING *",
-              [email, hash, "user", process.env.Default_Image]
-            );
-            const user = result.rows[0];
+            const result = await User.create(email, hash)
 
-            return res.json({result: true, message: "Đăng ký thành công!", user})
+            return res.status(201).json({result: true, message: "Đăng ký thành công!", result})
           }
         });
     }

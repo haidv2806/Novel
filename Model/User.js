@@ -1,13 +1,17 @@
 import db from "../API_Router/database.js";
+import env from "dotenv";
+
+env.config();
+
 
 class User {
-  static async create(email, password, displayname, picture) {
+  static async create(email, password) {
     const query = `
       INSERT INTO users (email, password, displayname, picture)
       VALUES ($1, $2, $3, $4)
-      RETURNING id, email;
+      RETURNING userid, email, displayname, picture;
     `;
-    const values = [email, password, displayname, picture];
+    const values = [email, password, "user", process.env.Default_Image];
     try {
       const result = await db.query(query, values);
       return result.rows[0];
@@ -19,7 +23,7 @@ class User {
 
   static async findById(id) {
     const query = `
-      SELECT id, email, password, displayname, picture
+      SELECT userid, email, password, displayname, picture
       FROM users
       WHERE id = $1;
     `;
@@ -34,7 +38,7 @@ class User {
 
   static async findByEmail(email) {
     const query = `
-      SELECT id, email, password, displayname, picture
+      SELECT userid, email
       FROM users
       WHERE email = $1;
     `;
