@@ -20,6 +20,6 @@ export default SignIn
 // Sử dụng
 // truyền dữ liệu vào body:
 // {
-//   "email": "user@example.com",
-//   "password": "password123"
+//   "email": string,
+//   "password": string
 // }

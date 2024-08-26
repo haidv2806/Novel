@@ -5,6 +5,7 @@ import env from "dotenv";
 import SignUp from "./API_Router/Auth/SignUp.js";
 import SignIn from "./API_Router/Auth/SignIn.js";
 import Avatar from "./API_Router/User/Avatar.js";
+import Name from "./API_Router/User/name.js";
 
 
 env.config();
@@ -28,6 +29,7 @@ app.use(express.json());
 app.use("/", SignUp)
 app.use("/", SignIn)
 app.use("/", Avatar)
+app.use("/", Name)
 
 
 app.listen(port, () => {
