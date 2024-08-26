@@ -11,8 +11,8 @@ CREATE TABLE novels (
     views SERIAL,
     likes SERIAL,
 
-    FOREIGN KEY (author_id) REFERENCES author(id),
-    FOREIGN KEY (artist_id) REFERENCES artist(id)
+    FOREIGN KEY (author_id) REFERENCES author(author_id),
+    FOREIGN KEY (artist_id) REFERENCES artist(artist_id)
 )
 
 
