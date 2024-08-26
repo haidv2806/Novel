@@ -7,9 +7,9 @@ env.config();
 class User {
     static async create(email, password) {
         const query = `
-      INSERT INTO users (email, password, username, avatar)
+      INSERT INTO users (email, password, user_name, avatar)
       VALUES ($1, $2, $3, $4)
-      RETURNING userid, email, username, avatar;
+      RETURNING user_id, email, user_name, avatar;
     `;
         const values = [email, password, "user", process.env.Default_Image];
         try {
@@ -23,9 +23,9 @@ class User {
 
     static async findById(id) {
         const query = `
-      SELECT userid, email, password, username, avatar
+      SELECT user_id, email, password, user_name, avatar
       FROM users
-      WHERE userid = $1;
+      WHERE user_id = $1;
     `;
         try {
             const result = await db.query(query, [id]);
@@ -38,7 +38,7 @@ class User {
 
     static async findByEmail(email) {
         const query = `
-      SELECT userid, email, password
+      SELECT user_id, email, password
       FROM users
       WHERE email = $1;
     `;
@@ -51,15 +51,15 @@ class User {
         }
     }
 
-    static async updateNewAvatar(userid, avatar) {
+    static async updateNewAvatar(user_id, avatar) {
         const query = `
     UPDATE users
     SET avatar = $2
-    WHERE userid = $1
-    RETURNING userid, email, avatar
+    WHERE user_id = $1
+    RETURNING user_id, email, avatar
     `;
         try {
-            const result = await db.query(query, [userid, avatar]);
+            const result = await db.query(query, [user_id, avatar]);
             return result.rows[0];
         } catch (err) {
             console.error('Error update avatar:', err);
@@ -67,12 +67,12 @@ class User {
         }
     }
 
-    static async updateNewName(userid, name){
+    static async updateNewName(user_id, name){
         const query = `
         UPDATE users
-        SET username = $2
-        WHERE userid = $1
-        RETURNING userid, email, username
+        SET user_name = $2
+        WHERE user_id = $1
+        RETURNING user_id, email, user_name
         `;
             try {
                 const result = await db.query(query, [userid, name]);
