@@ -7,10 +7,10 @@ env.config();
 class User {
     static async create(email, password) {
         const query = `
-      INSERT INTO users (email, password, user_name, avatar)
-      VALUES ($1, $2, $3, $4)
-      RETURNING user_id, email, user_name, avatar;
-    `;
+            INSERT INTO users (email, password, user_name, avatar)
+            VALUES ($1, $2, $3, $4)
+            RETURNING user_id, email, user_name, avatar;
+        `;
         const values = [email, password, "user", process.env.Default_Image];
         try {
             const result = await db.query(query, values);
@@ -23,10 +23,10 @@ class User {
 
     static async findById(id) {
         const query = `
-      SELECT user_id, email, password, user_name, avatar
-      FROM users
-      WHERE user_id = $1;
-    `;
+            SELECT user_id, email, password, user_name, avatar
+            FROM users
+            WHERE user_id = $1;
+        `;
         try {
             const result = await db.query(query, [id]);
             return result.rows[0];
@@ -38,10 +38,10 @@ class User {
 
     static async findByEmail(email) {
         const query = `
-      SELECT user_id, email, password
-      FROM users
-      WHERE email = $1;
-    `;
+            SELECT user_id, email, password
+            FROM users
+            WHERE email = $1;
+        `;
         try {
             const result = await db.query(query, [email]);
             return result.rows[0];
@@ -51,15 +51,15 @@ class User {
         }
     }
 
-    static async updateNewAvatar(user_id, avatar) {
+    static async updateNewAvatar(id, avatar) {
         const query = `
-    UPDATE users
-    SET avatar = $2
-    WHERE user_id = $1
-    RETURNING user_id, email, avatar
-    `;
+            UPDATE users
+            SET avatar = $2
+            WHERE user_id = $1
+            RETURNING user_id, email, avatar
+        `;
         try {
-            const result = await db.query(query, [user_id, avatar]);
+            const result = await db.query(query, [id, avatar]);
             return result.rows[0];
         } catch (err) {
             console.error('Error update avatar:', err);
@@ -67,20 +67,20 @@ class User {
         }
     }
 
-    static async updateNewName(user_id, name){
+    static async updateNewName(id, name) {
         const query = `
         UPDATE users
         SET user_name = $2
         WHERE user_id = $1
         RETURNING user_id, email, user_name
         `;
-            try {
-                const result = await db.query(query, [userid, name]);
-                return result.rows[0];
-            } catch (err) {
-                console.error('Error update Name:', err);
-                throw err;
-            }
+        try {
+            const result = await db.query(query, [id, name]);
+            return result.rows[0];
+        } catch (err) {
+            console.error('Error update Name:', err);
+            throw err;
+        }
     }
 }
 

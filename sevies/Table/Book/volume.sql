@@ -1,10 +1,10 @@
 CREATE TABLE volume (
     volume_id SERIAL PRIMARY KEY,
     volume_name VARCHAR (50) NOT NULL,
-    novel_id INT,
+    book_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (novel_id) REFERENCES noves(novel_id) ON DELETE CASCADE
+    FOREIGN KEY (book_id) REFERENCES books(book_id) ON DELETE CASCADE
 )
 
 

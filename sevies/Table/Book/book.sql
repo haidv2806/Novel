@@ -1,8 +1,9 @@
-CREATE TABLE novels (
-    novel_id SERIAL PRIMARY KEY,
-    novel_name VARCHAR (100) NOT NULL,
-    author_id VARCHAR (50) NOT NULL,
-    artist_id VARCHAR (50) NOT NULL,
+CREATE TABLE books (
+    book_id SERIAL PRIMARY KEY,
+    book_name VARCHAR (100) NOT NULL,
+    author_id VARCHAR (50),
+    artist_id VARCHAR (50),
+    trans_id VARCHAR (50),
     status VARCHAR (10) NOT NULL,
     description TEXT NOT NULL,
     total_index INT NOT NULL,
@@ -11,8 +12,9 @@ CREATE TABLE novels (
     views SERIAL,
     likes SERIAL,
 
-    FOREIGN KEY (author_id) REFERENCES author(author_id),
-    FOREIGN KEY (artist_id) REFERENCES artist(artist_id)
+    FOREIGN KEY (author_id) REFERENCES authors(author_id),
+    FOREIGN KEY (artist_id) REFERENCES artists(artist_id),
+    FOREIGN KEY (trans_id) REFERENCES users(user_id),
 )
 
 
