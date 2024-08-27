@@ -1,12 +1,13 @@
-import db from "../API_Router/database.js";
+import db from "../../API_Router/database";
+import Volume from "./Volume";
 
-class Book {
+class Book extends Volume {
     static async create(name, author, artist, status, decription) {
         const query = `
             INSERT INTO books (book_name, author_id, artist_id, status, description)
             VALUES ($1, $2, $3, $4, $5)
             RETURNING book_id, book_name
-        `;
+        `
         try {
             const result = await db.query(query, [name, author, artist, status, decription])
             return result.rows[0];
@@ -114,7 +115,7 @@ class Book {
                 INNER JOIN authors ON books.author_id = authors.author_id
             WHERE book_name % $1
             LIMIT 10 OFFSET $2
-        `;
+        `
         //tìm kiếm và chỉnh sửa các lỗi chính tả
         const levenshteinQuery = `
             SELECT book_name, image_path, author_name
@@ -123,7 +124,7 @@ class Book {
                 INNER JOIN authors ON books.author_id = authors.author_id
             WHERE LEVENSHTEIN(UPPER(book_name), UPPER($1)) <= 2
             LIMIT 10 OFFSET $2
-    `;
+        `
         // tìm kiếm toàn văn bản 
         const ftsQuery = `
             SELECT book_name, image_path, author_name
@@ -132,7 +133,7 @@ class Book {
                 INNER JOIN authors ON books.author_id = authors.author_id
             WHERE to_tsvector('vietnamese', book_name) @@ plainto_tsquery('vietnamese', $1)
             LIMIT 10 OFFSET $2
-    `;
+        `
         try {
             const trgmPromise = db.query(trgmQuery, [name, page * 10]);
             const levenshteinPromise = db.query(levenshteinQuery, [name, page * 10]);
@@ -154,7 +155,7 @@ class Book {
                 INNER JOIN authors ON books.author_id = authors.author_id
             WHERE author_name = $1
             LIMIT 10 OFFSET $2
-        `;
+        `
         try {
             const result = await db.query(query, [author, page * 10])
             return result.rows
@@ -173,7 +174,7 @@ class Book {
                 INNER JOIN artists ON books.artist_id = artists.artist_id
             WHERE author_name = $1
             LIMIT 10 OFFSET $2
-        `;
+        `
         try {
             const result = await db.query(query, [artist, page * 10])
             return result.rows
@@ -192,13 +193,32 @@ class Book {
             INNER JOIN users ON books.user_id = users.user_id
         WHERE author_name = $1
         LIMIT 10 OFFSET $2
-    `;
-    try {
-        const result = await db.query(query, [trans, page * 10])
-        return result.rows
-    } catch (err) {
-        console.error('Error finding book by trans name:', err);
-        throw err;
+        `
+        try {
+            const result = await db.query(query, [trans, page * 10])
+            return result.rows
+        } catch (err) {
+            console.error('Error finding book by trans name:', err);
+            throw err;
+        }
     }
+
+    static async createVolume(bookName, volumeName) {
+        const query = `
+            SELECT book_id
+            FROM books
+            WHERE book_name = $1
+        `
+        try {
+            const result = await db.query(query, bookName)
+            const book_id = result.rows[0]
+            super(book_id)
+            super.create(volumeName)
+        } catch (err) {
+            console.error('Error create volume:', err);
+            throw err;
+        }
     }
 }
+
+export default Book

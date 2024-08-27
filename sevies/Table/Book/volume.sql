@@ -1,4 +1,4 @@
-CREATE TABLE volume (
+CREATE TABLE volumes (
     volume_id SERIAL PRIMARY KEY,
     volume_name VARCHAR (50) NOT NULL,
     book_id INT,

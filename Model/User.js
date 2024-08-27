@@ -10,7 +10,7 @@ class User {
             INSERT INTO users (email, password, user_name, avatar)
             VALUES ($1, $2, $3, $4)
             RETURNING user_id, email, user_name, avatar;
-        `;
+        `
         const values = [email, password, "user", process.env.Default_Image];
         try {
             const result = await db.query(query, values);
@@ -26,7 +26,7 @@ class User {
             SELECT user_id, email, password, user_name, avatar
             FROM users
             WHERE user_id = $1;
-        `;
+        `
         try {
             const result = await db.query(query, [id]);
             return result.rows[0];
@@ -41,7 +41,7 @@ class User {
             SELECT user_id, email, password
             FROM users
             WHERE email = $1;
-        `;
+        `
         try {
             const result = await db.query(query, [email]);
             return result.rows[0];
@@ -57,7 +57,7 @@ class User {
             SET avatar = $2
             WHERE user_id = $1
             RETURNING user_id, email, avatar
-        `;
+        `
         try {
             const result = await db.query(query, [id, avatar]);
             return result.rows[0];
@@ -73,7 +73,7 @@ class User {
         SET user_name = $2
         WHERE user_id = $1
         RETURNING user_id, email, user_name
-        `;
+        `
         try {
             const result = await db.query(query, [id, name]);
             return result.rows[0];

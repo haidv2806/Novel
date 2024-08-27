@@ -1,11 +1,11 @@
-CREATE TABLE chapter (
+CREATE TABLE chapters (
     chapter_id SERIAL PRIMARY KEY,
-    volume_id INT NOT NULL,
     chapter_name VARCHAR(255) NOT NULL,
     content BYTEA,  -- Hoặc BLOB tùy thuộc vào DBMS
+    volume_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (volume_id) REFERENCES volume(id) ON DELETE CASCADE
+    FOREIGN KEY (volume_id) REFERENCES volumes(id) ON DELETE CASCADE
 );
 
 
