@@ -1,4 +1,4 @@
-CREATE TABLE novels_categories (
+CREATE TABLE books_categories (
     book_id INT,
     category_id INT,
     PRIMARY KEY (novel_id, category_id),
