@@ -24,16 +24,26 @@ class Volume extends Chapter {
         }
     }
 
-    static async createChapter(volumeName, ChapterName, content) {
+    static async findByName(name) {
         const query = `
-            SELECT volume_id
+            SELECT *
             FROM volumes
             WHERE volume_name = $1
             AND book_id = $2
         `
         try {
-            const result = await db.query(query, [volumeName, this.bookID])
-            const volume_id = result.rows[0]
+            const result = await db.query(query, [name, this.bookID])
+            return result.rows[0]
+        } catch (err) {
+            console.error('Error finding volume:', err);
+            throw err;
+        }       
+    }
+
+    static async createChapter(volumeName, ChapterName, content) {
+        try {
+            const volume = await this.findByName(volumeName)
+            const volume_id = volume.volume_id
             super(volume_id)
             super.create(ChapterName, content)
         } catch (err) {

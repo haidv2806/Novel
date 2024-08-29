@@ -1,5 +1,7 @@
 import db from "../../API_Router/database";
 import Volume from "./Volume";
+import Author from "../Persion/author";
+import Artist from "../Persion/Artist";
 
 class Book extends Volume {
     static async create(name, author, artist, status, decription) {
@@ -9,7 +11,11 @@ class Book extends Volume {
             RETURNING book_id, book_name
         `
         try {
-            const result = await db.query(query, [name, author, artist, status, decription])
+            const checkAuthor = Author.checkExist (author)
+            const author_id = checkAuthor.author_id
+            const checkArtist = Artist.checkExist (artist)
+            const artist_id = checkArtist.artist_id
+            const result = await db.query(query, [name, author_id, artist_id, status, decription])
             return result.rows[0];
         } catch (err) {
             console.error('Error creating book:', err);
@@ -28,6 +34,23 @@ class Book extends Volume {
             return result.rows[0];
         } catch (err) {
             console.error('Error finding book by id:', err);
+            throw err;
+        }
+    }
+
+    static async findByName(name){
+        const query =`
+            SELECT book_name, image_path, author_name
+            FROM books
+                INNER JOIN image ON books.book_id = image.book_id
+                INNER JOIN authors ON books.author_id = authors.author_id
+            WHERE book_name % $1            
+        `
+        try {
+            const result = await db.query(query, name)
+            return result.rows[0]
+        } catch (err) {
+            console.error('Error finding book by name:', err);
             throw err;
         }
     }
@@ -106,7 +129,7 @@ class Book extends Volume {
         }
     }
 
-    static async findByName(name, page) {
+    static async findBySearchName(name, page) {
         // tìm kiếm gần giống
         const trgmQuery = `
             SELECT book_name, image_path, author_name
@@ -204,14 +227,9 @@ class Book extends Volume {
     }
 
     static async createVolume(bookName, volumeName) {
-        const query = `
-            SELECT book_id
-            FROM books
-            WHERE book_name = $1
-        `
         try {
-            const result = await db.query(query, bookName)
-            const book_id = result.rows[0]
+            const result = await this.findByName(bookName)
+            const book_id = result.book_id
             super(book_id)
             super.create(volumeName)
         } catch (err) {

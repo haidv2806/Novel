@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import passport from "passport";
 import { Strategy } from "passport-local";
-import User from "./User.js";
+import User from "./Persion/User.js";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import jwt from 'jsonwebtoken';
 import env from "dotenv";

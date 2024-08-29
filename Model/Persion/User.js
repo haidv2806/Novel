@@ -1,4 +1,4 @@
-import db from "../API_Router/database.js";
+import db from "../../API_Router/database";
 import env from "dotenv";
 
 env.config();
