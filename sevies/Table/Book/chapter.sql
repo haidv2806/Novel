@@ -4,7 +4,8 @@ CREATE TABLE chapters (
     content BYTEA,  -- Hoặc BLOB tùy thuộc vào DBMS
     volume_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
+    
+    CONSTRAINT unique_chapter_per_Volume UNIQUE (volume_id, chapter_name),
     FOREIGN KEY (volume_id) REFERENCES volumes(volume_id) ON DELETE CASCADE
 );
 

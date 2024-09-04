@@ -1,5 +1,6 @@
 import db from "../../API_Router/database.js";
 import Volume from "./Volume.js";
+import Chapter from "./Chapter.js";
 import Author from "../Person/author.js";
 import Artist from "../Person/Artist.js";
 
@@ -255,6 +256,28 @@ class Book {
             return volume
         } catch (err) {   
             console.error('Error create volume:', err);
+            throw err;
+        }
+    }
+
+    static async createChapter(bookName, volumeName, chapterName, content){
+        try {
+            const checkBook = await Book.findByNameCreateVolume(bookName)
+            if (!checkBook) {
+                throw new Error(`không tìm thấy sách tên ${bookName}`);
+            }
+            const book_id = checkBook.book_id  
+
+            const checkVolume = await Volume.findByName(volumeName, book_id)
+            if (!checkVolume) {
+                throw new Error(`không tìm thấy volume ${volumeName} thuộc sách tên ${bookName}`);
+            }
+            const volume_id = checkVolume.volume_id
+
+            const chapter = await Chapter.create(chapterName, content, volume_id)
+            return chapter
+        } catch (err) {   
+            console.error('Error create Chapter:', err);
             throw err;
         }
     }

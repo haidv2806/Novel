@@ -1,7 +1,7 @@
 import db from "../../API_Router/database.js";
 import Chapter from "./Chapter.js";
 
-class Volume extends Chapter {
+class Volume{
 
     static async create(name, bookID) {
         const query = `
@@ -45,10 +45,10 @@ class Volume extends Chapter {
 
     // static async createChapter(volumeName, ChapterName, content) {
     //     try {
-    //         const volume = await this.findByName(volumeName)
+    //         const volume = await Volume.findByName(volumeName)
     //         const volume_id = volume.volume_id
-    //         super(volume_id)
-    //         super.create(ChapterName, content)
+    //         const chapter = await Chapter.create(ChapterName, content, volume_id)
+    //         return chapter
     //     } catch (err) {
     //         console.error('Error creating chapter:', err);
     //         throw err;
