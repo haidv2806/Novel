@@ -5,7 +5,7 @@ CREATE TABLE chapters (
     volume_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (volume_id) REFERENCES volumes(id) ON DELETE CASCADE
+    FOREIGN KEY (volume_id) REFERENCES volumes(volume_id) ON DELETE CASCADE
 );
 
 

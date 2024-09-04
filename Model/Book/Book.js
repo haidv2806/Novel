@@ -1,9 +1,10 @@
-import db from "../../API_Router/database";
-import Volume from "./Volume";
-import Author from "../Persion/author";
-import Artist from "../Persion/Artist";
+import db from "../../API_Router/database.js";
+import Volume from "./Volume.js";
+import Author from "../Person/author.js";
+import Artist from "../Person/Artist.js";
 
-class Book extends Volume {
+
+class Book {
     static async create(name, author, artist, status, decription) {
         const query = `
             INSERT INTO books (book_name, author_id, artist_id, status, description)
@@ -11,9 +12,9 @@ class Book extends Volume {
             RETURNING book_id, book_name
         `
         try {
-            const checkAuthor = Author.checkExist (author)
+            const checkAuthor = await Author.checkExist (author)
             const author_id = checkAuthor.author_id
-            const checkArtist = Artist.checkExist (artist)
+            const checkArtist = await Artist.checkExist (artist)
             const artist_id = checkArtist.artist_id
             const result = await db.query(query, [name, author_id, artist_id, status, decription])
             return result.rows[0];
@@ -27,10 +28,10 @@ class Book extends Volume {
         const query = `
             SELECT *
             FROM books
-            WWHERE book_id = $1
+            WHERE book_id = $1
         `
         try {
-            const result = await db.query(query, id)
+            const result = await db.query(query, [id])
             return result.rows[0];
         } catch (err) {
             console.error('Error finding book by id:', err);
@@ -40,14 +41,29 @@ class Book extends Volume {
 
     static async findByName(name){
         const query =`
-            SELECT book_name, image_path, author_name
+            SELECT books.book_id, book_name, image_path, author_name
             FROM books
                 INNER JOIN image ON books.book_id = image.book_id
                 INNER JOIN authors ON books.author_id = authors.author_id
-            WHERE book_name % $1            
+            WHERE book_name = $1            
         `
         try {
-            const result = await db.query(query, name)
+            const result = await db.query(query, [name])
+            return result.rows[0]
+        } catch (err) {
+            console.error('Error finding book by name:', err);
+            throw err;
+        }
+    }
+
+    static async findByNameCreateVolume(name){
+        const query =`
+            SELECT book_id, book_name
+            FROM books
+            WHERE book_name = $1            
+        `
+        try {
+            const result = await db.query(query, [name])
             return result.rows[0]
         } catch (err) {
             console.error('Error finding book by name:', err);
@@ -65,7 +81,7 @@ class Book extends Volume {
             LIMIT 10 OFFSET $1
         `
         try {
-            const result = await db.query(query, page * 10)
+            const result = await db.query(query, [page * 10])
             return result.rows
         } catch (err) {
             console.error('Error finding book by view:', err);
@@ -83,7 +99,7 @@ class Book extends Volume {
             LIMIT 10 OFFSET $1
         `
         try {
-            const result = await db.query(query, page * 10)
+            const result = await db.query(query, [page * 10])
             return result.rows
         } catch (err) {
             console.error('Error finding book by like:', err);
@@ -101,7 +117,7 @@ class Book extends Volume {
             LIMIT 10 OFFSET $1
         `
         try {
-            const result = await db.query(query, page * 10)
+            const result = await db.query(query, [page * 10])
             return result.rows
         } catch (err) {
             console.error('Error finding book by rating:', err);
@@ -118,7 +134,7 @@ class Book extends Volume {
                 INNER JOIN books_categories ON books.book_id = books_categories.book_id
                 INNER JOIN categories ON books.category_id = categories.category_id
             WHERE category_name = $1
-            LIMIT 10 OFFSET $1
+            LIMIT 10 OFFSET $2
         `
         try {
             const result = await db.query(query, [genre, page * 10])
@@ -228,11 +244,16 @@ class Book extends Volume {
 
     static async createVolume(bookName, volumeName) {
         try {
-            const result = await this.findByName(bookName)
-            const book_id = result.book_id
-            super(book_id)
-            super.create(volumeName)
-        } catch (err) {
+            const result = await Book.findByNameCreateVolume(bookName)
+
+            if (!result) {
+                throw new Error(`không tìm thấy sách tên "${bookName}"`);
+            }
+            
+            const book_id = result.book_id      
+            const volume = await Volume.create(volumeName, book_id)           
+            return volume
+        } catch (err) {   
             console.error('Error create volume:', err);
             throw err;
         }

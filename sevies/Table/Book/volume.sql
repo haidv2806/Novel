@@ -1,9 +1,10 @@
 CREATE TABLE volumes (
     volume_id SERIAL PRIMARY KEY,
     volume_name VARCHAR (50) NOT NULL,
-    book_id INT,
+    book_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
+    CONSTRAINT unique_volume_per_book UNIQUE (book_id, volume_name),
     FOREIGN KEY (book_id) REFERENCES books(book_id) ON DELETE CASCADE
 )
 

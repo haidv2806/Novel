@@ -1,6 +1,6 @@
 import express, { json, response } from "express";
 import passport from "../../Model/passport.js";
-import User from "../../Model/User.js";
+import User from "../../Model/Person/User.js";
 
 const Avatar = express.Router();
 

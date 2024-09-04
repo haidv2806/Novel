@@ -1,7 +1,7 @@
 import express, { json, response} from "express";
 import bcrypt from "bcrypt"
 import env from "dotenv";
-import User from "../../Model/Persion/User.js";
+import User from "../../Model/Person/User.js";
 
 env.config();
 

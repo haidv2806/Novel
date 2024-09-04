@@ -1,4 +1,4 @@
-import db from "../../API_Router/database";
+import db from "../../API_Router/database.js";
 
 class Chapter {
     constructor (volumeID){

@@ -1,14 +1,14 @@
-import db from "../../API_Router/database";
+import db from "../../API_Router/database.js";
 
 class Author {
     static async create(name) {
         const query = `
             INSERT INTO authors (author_name)
-            VALUES $1
+            VALUES ($1)
             RETURNING *            
         `
         try {
-            const result = await db.query(query, name)
+            const result = await db.query(query, [name])
             return result.rows[0]
         } catch (err) {
             console.error('Error create author:', err);
@@ -23,7 +23,7 @@ class Author {
             WHERE author_id = $1
         `
         try {
-            const result = await db.query(query, id)
+            const result = await db.query(query, [id])
             return result.rows[0]
         } catch (err) {
             console.error('Error finding author by id:', err);
@@ -38,7 +38,7 @@ class Author {
         WHERE author_name = $1
     `
         try {
-            const result = await db.query(query, name)
+            const result = await db.query(query, [name])
             return result.rows[0]
         } catch (err) {
             console.error('Error finding author by name:', err);
@@ -47,11 +47,11 @@ class Author {
     }
 
     static async checkExist(name) {
-        const check = this.findByName(name)
+        const check = await Author.findByName(name)
         if (check) {
             return check
         } else {
-            const createAuthor = this.create(name)
+            const createAuthor = await Author.create(name)
             return createAuthor
         }
     }

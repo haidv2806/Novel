@@ -1,20 +1,20 @@
 CREATE TABLE books (
     book_id SERIAL PRIMARY KEY,
     book_name VARCHAR (100) NOT NULL,
-    author_id VARCHAR (50),
-    artist_id VARCHAR (50),
-    trans_id VARCHAR (50),
-    status VARCHAR (10) NOT NULL,
+    author_id INT NOT NULL,
+    artist_id INT NOT NULL,
+    trans_id INT,
+    status VARCHAR (50) NOT NULL,
     description TEXT NOT NULL,
-    total_index INT NOT NULL,
+    total_index INT,
     average_rating DECIMAL(3, 2),
-    rating_count SERIAL,
-    views SERIAL,
-    likes SERIAL,
+    rating_count INT,
+    views INT,
+    likes INT,
 
     FOREIGN KEY (author_id) REFERENCES authors(author_id),
     FOREIGN KEY (artist_id) REFERENCES artists(artist_id),
-    FOREIGN KEY (trans_id) REFERENCES users(user_id),
+    FOREIGN KEY (trans_id) REFERENCES users(user_id)
 )
 
 
