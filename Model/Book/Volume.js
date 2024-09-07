@@ -5,8 +5,15 @@ class Volume{
 
     static async create(name, bookID) {
         const query = `
-            INSERT INTO volumes (volume_name, book_id)
-            VALUES ($1, $2)
+            INSERT INTO volumes (volume_name, book_id, volume_number)
+            SELECT
+                $1,
+                $2,
+                COALESCE(MAX(volume_number), 0) + 1
+            FROM
+                volumes
+            WHERE
+                book_id = $2
             RETURNING *
         `
         try {

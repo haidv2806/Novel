@@ -13,9 +13,9 @@ BookController.post("/create", async (req, res, cb) => {
 
     try {
         const result = await Book.create(name, author, artist, status, decription)
-        res.status(200).json( {result: true, message: "tạo bộ sách mới thành công", book: result})
+        res.status(200).json({ result: true, message: "tạo bộ sách mới thành công", book: result })
     } catch (err) {
-        return res.status(500).json({ result: false, message: "Đã xảy ra lỗi sách mới", error: err });
+        return res.status(500).json({ result: false, message: "Đã xảy ra lỗi khi tạo sách mới", error: err.message });
     }
 })
 
@@ -28,5 +28,32 @@ BookController.post("/create", async (req, res, cb) => {
 //   "status": string,
 //   "decription": string
 // }
+
+BookController.get("/:bookId", async (req, res) => {
+    const bookid = req.params.bookId
+    try {
+        const result = await Book.findById(bookid)     
+        res.status(200).json({ result: true, message: "tìm kiếm sách thông quaID thành công", Book: result})
+    } catch (err) {
+        return res.status(500).json({ result: false, message: "Đã xảy ra lỗi tìm sách bằng ID", error: err.message });
+    }
+})
+
+// sử dụng
+//gửi get vào: BaseURL/Book/<INT>
+
+BookController.post("/search", async (req, res) => {
+    const name = req.body.name
+    const page = parseInt(req.params.page) || 1;  // Kiểm tra và đặt giá trị mặc định cho page
+    try {
+        const result = await Book.findBySearchName(name, page)
+        res.status(200).json({ result: true, message: "tìm kiếm sách thông qua tên thành công", Book: result})
+    } catch (err) {
+        return res.status(500).json({ result: false, message: "Đã xảy ra lỗi tìm sách bằng tên", error: err.message });
+    }
+})
+
+// sử dụng
+//gửi post vào: BaseURL/Book/<INT>
 
 export default BookController

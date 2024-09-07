@@ -13,9 +13,9 @@ class Book {
             RETURNING book_id, book_name
         `
         try {
-            const checkAuthor = await Author.checkExist (author)
+            const checkAuthor = await Author.checkExist(author)
             const author_id = checkAuthor.author_id
-            const checkArtist = await Artist.checkExist (artist)
+            const checkArtist = await Artist.checkExist(artist)
             const artist_id = checkArtist.artist_id
             const result = await db.query(query, [name, author_id, artist_id, status, decription])
             return result.rows[0];
@@ -33,6 +33,9 @@ class Book {
         `
         try {
             const result = await db.query(query, [id])
+            if (!result.rows[0]) {
+                throw new Error("Không tồn tại id")
+            }
             return result.rows[0];
         } catch (err) {
             console.error('Error finding book by id:', err);
@@ -40,8 +43,8 @@ class Book {
         }
     }
 
-    static async findByName(name){
-        const query =`
+    static async findByName(name) {
+        const query = `
             SELECT books.book_id, book_name, image_path, author_name
             FROM books
                 INNER JOIN image ON books.book_id = image.book_id
@@ -57,8 +60,8 @@ class Book {
         }
     }
 
-    static async findByNameCreateVolume(name){
-        const query =`
+    static async findByNameCreateVolume(name) {
+        const query = `
             SELECT book_id, book_name
             FROM books
             WHERE book_name = $1            
@@ -175,11 +178,27 @@ class Book {
             LIMIT 10 OFFSET $2
         `
         try {
-            const trgmPromise = db.query(trgmQuery, [name, page * 10]);
-            const levenshteinPromise = db.query(levenshteinQuery, [name, page * 10]);
-            const ftsPromise = db.query(ftsQuery, [name, page * 10]);
+            // Thực hiện truy vấn và bắt lỗi riêng cho từng promise
+            const trgmPromise = db.query(trgmQuery, [name, (page * 10) - 10])
+                .then(result => result.rows.length > 0 ? result : null)
+                .catch(err => null);
+
+            const levenshteinPromise = db.query(levenshteinQuery, [name, (page * 10) - 10])
+                .then(result => result.rows.length > 0 ? result : null)
+                .catch(err => null);
+
+            const ftsPromise = db.query(ftsQuery, [name, (page * 10) - 10])
+                .then(result => result.rows.length > 0 ? result : null)
+                .catch(err => null);
+
             // Sử dụng Promise.race để lấy kết quả của truy vấn hoàn thành trước
             const result = await Promise.race([trgmPromise, levenshteinPromise, ftsPromise]);
+            if (!result.rows[0]) {
+                throw new Error("Không tìm thấy kết quả nào")
+            }
+            console.log(result);
+
+
             return result.rows
         } catch (err) {
             console.error('Error finding book by name:', err);
@@ -250,23 +269,23 @@ class Book {
             if (!result) {
                 throw new Error(`không tìm thấy sách tên "${bookName}"`);
             }
-            
-            const book_id = result.book_id      
-            const volume = await Volume.create(volumeName, book_id)           
+
+            const book_id = result.book_id
+            const volume = await Volume.create(volumeName, book_id)
             return volume
-        } catch (err) {   
+        } catch (err) {
             console.error('Error create volume:', err);
             throw err;
         }
     }
 
-    static async createChapter(bookName, volumeName, chapterName, content){
+    static async createChapter(bookName, volumeName, chapterName, content) {
         try {
             const checkBook = await Book.findByNameCreateVolume(bookName)
             if (!checkBook) {
                 throw new Error(`không tìm thấy sách tên ${bookName}`);
             }
-            const book_id = checkBook.book_id  
+            const book_id = checkBook.book_id
 
             const checkVolume = await Volume.findByName(volumeName, book_id)
             if (!checkVolume) {
@@ -276,7 +295,7 @@ class Book {
 
             const chapter = await Chapter.create(chapterName, content, volume_id)
             return chapter
-        } catch (err) {   
+        } catch (err) {
             console.error('Error create Chapter:', err);
             throw err;
         }

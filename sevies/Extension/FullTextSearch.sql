@@ -58,3 +58,11 @@ LIMIT 10;
 
 -- PostgreSQL hỗ trợ tìm kiếm toàn văn bản cho tiếng Việt thông qua việc cấu hình từ điển và sử dụng các
 --  tiện ích hỗ trợ như `unaccent`. Đảm bảo rằng bạn đã tạo chỉ mục và cấu hình tìm kiếm phù hợp để đạt được hiệu suất tìm kiếm tốt nhất.
+
+
+CREATE EXTENSION unaccent;
+CREATE TEXT SEARCH CONFIGURATION vietnamese ( COPY = pg_catalog.english );
+ALTER TEXT SEARCH CONFIGURATION vietnamese
+    ALTER MAPPING FOR hword, hword_part, word
+    WITH unaccent, simple;
+CREATE INDEX idx_books_book_name ON books USING GIST(to_tsvector('vietnamese', book_name));
