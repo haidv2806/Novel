@@ -2,8 +2,8 @@ import express, { json, response} from "express";
 import session from "express-session";
 import env from "dotenv";
 
-import SignUp from "./API_Router/Auth/SignUp.js";
-import SignIn from "./API_Router/Auth/SignIn.js";
+
+import Auth from "./API_Router/Auth/AuthController.js";
 import Avatar from "./API_Router/User/Avatar.js";
 import Name from "./API_Router/User/Name.js";
 import BookController from "./API_Router/BookController/BookController.js";
@@ -31,8 +31,7 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use("/Auth", SignUp)
-app.use("/Auth", SignIn)
+app.use("/Auth", Auth)
 app.use("/User", Avatar)
 app.use("/User", Name)
 app.use("/Book", BookController)
