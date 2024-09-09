@@ -53,10 +53,10 @@ class User {
 
     static async updateNewAvatar(id, avatar) {
         const query = `
-            UPDATE users
-            SET avatar = $2
-            WHERE user_id = $1
-            RETURNING user_id, email, avatar
+                UPDATE users
+                SET avatar = $2
+                WHERE user_id = $1
+                RETURNING user_id, email, avatar
         `
         try {
             const result = await db.query(query, [id, avatar]);
@@ -69,16 +69,31 @@ class User {
 
     static async updateNewName(id, name) {
         const query = `
-        UPDATE users
-        SET user_name = $2
-        WHERE user_id = $1
-        RETURNING user_id, email, user_name
+            UPDATE users
+            SET user_name = $2
+            WHERE user_id = $1
+            RETURNING user_id, email, user_name
         `
         try {
             const result = await db.query(query, [id, name]);
             return result.rows[0];
         } catch (err) {
             console.error('Error update Name:', err);
+            throw err;
+        }
+    }
+
+    static async updateUserInteraction(book_id, user_id, interaction_type, value){
+        const query = `
+            INSERT INTO user_interactions (book_id, user_id, interaction_type, value)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *
+        `
+        try {
+            const result = await db.query(query, [book_id, user_id, interaction_type, value])
+            return result.rows[0]
+        } catch (err) {
+            console.error('Error handler interaction:', err);
             throw err;
         }
     }

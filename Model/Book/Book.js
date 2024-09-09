@@ -152,10 +152,11 @@ class Book {
     static async findBySearchName(name, page) {
         // tìm kiếm toàn văn bản 
         const query = ` 
-            SELECT book_id
+            SELECT book_id, ts_rank(search_text_vector, plainto_tsquery('vietnamese', $1)) AS rank
             FROM search
             WHERE search_text_vector @@ plainto_tsquery('vietnamese', $1)
             OR search_text %> $1
+            ORDER BY rank
             LIMIT 10 OFFSET $2;
         `
         try {
@@ -233,6 +234,40 @@ class Book {
         }
     }
 
+    static async addTotalIndex(id, indexNumber){
+        const query = `
+            UPDATE books
+            SET total_index = COALESCE(total_index, 0) + $2
+            WHERE book_id = $1
+            RETURNING * 
+        `
+        try {
+            console.log(id, indexNumber);
+            
+            const result = await db.query(query, [id, indexNumber])
+            return result.rows[0]
+        } catch (err) {
+            console.error('Error update tolal index', err);
+            throw err;
+        }
+    }
+
+    static async addView(id){
+        const query = `
+            UPDATE books
+            SET views = COALESCE(views, 0) + 1
+            WHERE book_id = $1
+            RETURNING * 
+        `
+        try {
+            const result = await db.query(query, [id])
+            return result.rows[0]
+        } catch (err) {
+            console.error('Error update View', err);
+            throw err;
+        }
+    }
+
     static async createVolume(bookName, volumeName) {
         try {
             const result = await Book.findByNameCreateVolume(bookName)
@@ -264,7 +299,7 @@ class Book {
             }
             const volume_id = checkVolume.volume_id
 
-            const chapter = await Chapter.create(chapterName, content, volume_id)
+            const chapter = await Chapter.create(chapterName, content, volume_id, book_id)
             return chapter
         } catch (err) {
             console.error('Error create Chapter:', err);

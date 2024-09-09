@@ -12,7 +12,7 @@ Avatar.post("/avatar", passport.authenticate('jwt', { session: false, optional: 
 
       res.status(200).json({ result: true, message: 'New avatar uploaded successfully', user: result });
     } catch (error) {
-      return res.status(500).json({ result: false, message: "Không thay đổi avatar" })
+      return res.status(500).json({ result: false, message: "Không thay đổi avatar", error: err.message })
     }
   });
 

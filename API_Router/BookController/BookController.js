@@ -40,7 +40,7 @@ BookController.get("/:bookId", async (req, res) => {
 })
 
 // sử dụng
-//gửi get vào: BaseURL/Book/<INT>
+// gửi get vào: BaseURL/Book/<INT>
 
 BookController.post("/search", async (req, res) => {
     const name = req.body.name
@@ -54,6 +54,12 @@ BookController.post("/search", async (req, res) => {
 })
 
 // sử dụng
-//gửi post vào: BaseURL/Book/<INT>
+// gửi post vào: BaseURL/Book/<INT>
+// Truyền dữ liệu vào body
+// {
+// name: string
+// }
+
+
 
 export default BookController

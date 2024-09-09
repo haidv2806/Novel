@@ -1,5 +1,4 @@
 import db from "../../API_Router/database.js";
-import Chapter from "./Chapter.js";
 
 class Volume{
 
@@ -49,18 +48,6 @@ class Volume{
             throw err;
         }       
     }
-
-    // static async createChapter(volumeName, ChapterName, content) {
-    //     try {
-    //         const volume = await Volume.findByName(volumeName)
-    //         const volume_id = volume.volume_id
-    //         const chapter = await Chapter.create(ChapterName, content, volume_id)
-    //         return chapter
-    //     } catch (err) {
-    //         console.error('Error creating chapter:', err);
-    //         throw err;
-    //     }
-    // }
 }
 
 export default Volume

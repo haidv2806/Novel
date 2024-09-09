@@ -2,7 +2,7 @@ import express, { json, response} from "express";
 import session from "express-session";
 import env from "dotenv";
 
-
+import InteractionController from "./API_Router/User/InteractionController.js";
 import Auth from "./API_Router/Auth/AuthController.js";
 import Avatar from "./API_Router/User/Avatar.js";
 import Name from "./API_Router/User/Name.js";
@@ -34,6 +34,7 @@ app.use(express.json());
 app.use("/Auth", Auth)
 app.use("/User", Avatar)
 app.use("/User", Name)
+app.use("/User", InteractionController)
 app.use("/Book", BookController)
 app.use("/Book/Volume", VolumeController)
 app.use("/Book/Volume/Chapter", ChapterController)

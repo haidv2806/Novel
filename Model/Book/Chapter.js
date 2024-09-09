@@ -1,15 +1,17 @@
 import db from "../../API_Router/database.js";
 import mammoth from "mammoth";
 import fs from "fs"
+import Book from "./Book.js";
 
 class Chapter {
-    static async create(name, content, volumeID) {
+    static async create(name, content, volumeID, BookID) {
         const query = `
-            INSERT INTO chapters (chapter_name, content, volume_id, chapter_number)
+            INSERT INTO chapters (chapter_name, content, volume_id, book_id, chapter_number)
             SELECT
                 $1,
                 $2,
                 $3,
+                $4,
                 COALESCE(MAX(chapter_number), 0) + 1
             FROM
                 chapters
@@ -18,7 +20,13 @@ class Chapter {
             RETURNING chapter_id, chapter_name, volume_id, created_at
         `
         try {
-            const result = await db.query(query, [name, content, volumeID])
+            const result = await db.query(query, [name, content, volumeID, BookID])
+            mammoth.extractRawText({ path: content })
+                .then(function (result) {
+                    var text = result.value; // The raw text
+                    var textLength = text.length;
+                    const addTotalIndex = Book.addTotalIndex(BookID, textLength)
+                })
             return result.rows[0]
         } catch (err) {
             if (err.code === '23505') { // PostgreSQL unique violation error code
@@ -53,10 +61,14 @@ class Chapter {
 
         try {
             const result = await db.query(query, [id]);
-
             if (result.rows.length === 0) {
                 throw new Error('Chapter not found');
             }
+
+            // thêm 1 view
+            const chapter = await Chapter.findByid(id)
+            const book_id = chapter.book_id
+            const addView = await Book.addView(book_id)
 
             const filePath = result.rows[0].content;
 

@@ -4,10 +4,12 @@ CREATE TABLE chapters (
     chapter_number INT,
     content VARCHAR(255),  -- Hoặc BLOB tùy thuộc vào DBMS
     volume_id INT NOT NULL,
+    book_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT unique_chapter_per_Volume UNIQUE (volume_id, chapter_name),
-    FOREIGN KEY (volume_id) REFERENCES volumes(volume_id) ON DELETE CASCADE
+    FOREIGN KEY (volume_id) REFERENCES volumes(volume_id) ON DELETE CASCADE,
+    FOREIGN KEY (book_id) REFERENCES books(book_id) ON DELETE CASCADE  
 );
 
 
