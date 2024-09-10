@@ -6,9 +6,9 @@ BEGIN
         -- Cập nhật số lượng và điểm đánh giá trung bình của sách
         UPDATE books
         SET
-            rating_count = rating_count + 1,
+            rating_count = COALESCE(rating_count, 0) + 1,
             average_rating = (
-                (average_rating * rating_count) + CAST(NEW.value AS DECIMAL)
+                (COALESCE(average_rating, 5) * rating_count) + CAST(NEW.value AS DECIMAL)
             ) / (rating_count + 1)
         WHERE book_id = NEW.book_id;
     END IF;
