@@ -8,10 +8,10 @@ Avatar.post("/avatar", passport.authenticate('jwt', { session: false, optional: 
   async (req, res, cb) => {
     try {
       const picture = req.body.picture
-      const result = await User.updateNewAvatar(req.user.userid, picture)
+      const result = await User.updateNewAvatar(req.user.user_id, picture)
 
       res.status(200).json({ result: true, message: 'New avatar uploaded successfully', user: result });
-    } catch (error) {
+    } catch (err) {
       return res.status(500).json({ result: false, message: "Không thay đổi avatar", error: err.message })
     }
   });

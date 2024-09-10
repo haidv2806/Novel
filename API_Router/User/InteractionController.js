@@ -10,7 +10,7 @@ InteractionController.post("/interaction", passport.authenticate('jwt', { sessio
             const type = req.body.type
             const book_id = req.body.book_id
             const value = req.body.value ? req.body.value : "";
-            const result = await User.updateUserInteraction(book_id, req.user.userid, type, value)
+            const result = await User.updateUserInteraction(book_id, req.user.user_id, type, value)
 
             res.status(200).json({ result: true, message: `trạng thái tương tác ${type} được cập nhật`, user: result });
         } catch (err) {

@@ -29,7 +29,7 @@ passport.use(
             return cb(err);
           } else {
             if (valid) {
-              const payload = { userid: checkEmail.userid, email: checkEmail.email };
+              const payload = { user_id: checkEmail.user_id, email: checkEmail.email };
               const token = jwt.sign(payload, secretOrKey, { expiresIn: expiresToken });
               return cb(null, token ,checkEmail);
             } else {
@@ -39,7 +39,7 @@ passport.use(
         });
 
       } else {
-        return cb("không có email");
+        return cb(null, false, { message: 'Email không tồn tại' });
       }
     } catch (err) {
       console.log(err);
@@ -56,14 +56,14 @@ const option = {
 
 passport.use(new JwtStrategy(option, async (payload, cb) => {
   try {
-    const user = await User.findById(payload.userid);
+    const user = await User.findById(payload.user_id);
     if (user) {
-      return cb(null, user);
+      return cb(null, user);// xác thực thành công
     } else {
-      return cb(null, false);
+      return cb(null, false);// không thấy người dùng
     }
   } catch (err) {
-    return cb(err, false);
+    return cb(err, false);// xử lý lỗi
   }
 }));
 

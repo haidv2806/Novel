@@ -8,10 +8,10 @@ Name.post("/name", passport.authenticate('jwt', { session: false, optional: fals
   async (req, res, cb) => {
     try {
       const name = req.body.name
-      const result = await User.updateNewName(req.user.userid, name)
+      const result = await User.updateNewName(req.user.user_id, name)
 
       res.status(200).json({ result: true, message: 'New name uploaded successfully', user: result });
-    } catch (error) {
+    } catch (err) {
       return res.status(500).json({ result: false, message: "Không thay đổi được tên người dùng", error: err.message})
     }
   });

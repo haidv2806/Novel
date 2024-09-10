@@ -4,7 +4,7 @@ CREATE TABLE user_interactions (
     user_id INT,
     interaction_type VARCHAR(50),
     value TEXT,
-    interaction_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (book_id) REFERENCES books(book_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
