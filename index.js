@@ -2,12 +2,12 @@ import express, { json, response} from "express";
 import session from "express-session";
 import env from "dotenv";
 
-import InteractionController from "./API_Router/User/InteractionController.js";
-import Auth from "./API_Router/Auth/AuthController.js";
-import UserController from "./API_Router/User/UserController.js";
-import BookController from "./API_Router/BookController/BookController.js";
-import VolumeController from "./API_Router/BookController/VolumeController.js";
-import ChapterController from "./API_Router/BookController/ChapterController.js";
+import InteractionController from "./Service/User/InteractionController.js";
+import Auth from "./Service/Auth/AuthController.js";
+import UserController from "./Service/User/UserController.js";
+import BookController from "./Service/BookController/BookController.js";
+import VolumeController from "./Service/BookController/VolumeController.js";
+import ChapterController from "./Service/BookController/ChapterController.js";
 
 
 env.config();

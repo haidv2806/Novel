@@ -1,4 +1,4 @@
-import db from "../../API_Router/database.js";
+import db from "../../Service/database.js";
 import Volume from "./Volume.js";
 import Chapter from "./Chapter.js";
 import Author from "../Person/author.js";

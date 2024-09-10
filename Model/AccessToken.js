@@ -1,4 +1,4 @@
-import db from '../API_Router/database.js';
+import db from '../Service/database.js';
 
 class AccessToken {
   static async create(token, userId) {
