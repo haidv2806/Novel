@@ -4,8 +4,7 @@ import env from "dotenv";
 
 import InteractionController from "./API_Router/User/InteractionController.js";
 import Auth from "./API_Router/Auth/AuthController.js";
-import Avatar from "./API_Router/User/Avatar.js";
-import Name from "./API_Router/User/Name.js";
+import UserController from "./API_Router/User/UserController.js";
 import BookController from "./API_Router/BookController/BookController.js";
 import VolumeController from "./API_Router/BookController/VolumeController.js";
 import ChapterController from "./API_Router/BookController/ChapterController.js";
@@ -32,8 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use("/Auth", Auth)
-app.use("/User", Avatar)
-app.use("/User", Name)
+app.use("/User", UserController)
 app.use("/User", InteractionController)
 app.use("/Book", BookController)
 app.use("/Book/Volume", VolumeController)

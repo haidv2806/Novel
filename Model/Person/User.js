@@ -94,12 +94,41 @@ class User {
             const type = ["like", "bookMark", "rating"]
             if (!type.includes(interaction_type)) {
                 throw new Error(`type chỉ được một trong những loại sau: ${type.join(", ")}`)
+            }else if (interaction_type == "rating" & value > 5){
+                throw new Error (`value của bạn là ${value}, và lớn hơn 5`)
             }
 
             const result = await db.query(query, [book_id, user_id, interaction_type, value])
             return result.rows[0]
         } catch (err) {
             console.error('Error handler interaction:', err);
+            throw err;
+        }
+    }
+
+    static async checkBookMark(id, page){
+        const query = `
+            SELECT book_id
+            From user_interactions
+            WHERE user_id = $1
+            AND interaction_type = 'bookMark'
+            LIMIT 10 OFFSET $2;
+        `
+        try {
+            const books = await db.query(query, [id, (page * 10) - 10])
+            if(!books.rows){
+                throw new Error("Người dùng đang không để bookMark nào")
+            }
+
+            const result = []
+            for(let i = 0; i < books.rows.length; i++){
+                const book = await Book.findById(books.rows[i].book_id)
+                result.push(book)
+            }
+
+            return result
+        } catch (err) {
+            console.error('Không tìm thấy những quốn sách mà user đã đánh dấu', err);
             throw err;
         }
     }
