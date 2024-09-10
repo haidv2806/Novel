@@ -1,5 +1,6 @@
 import db from "../../API_Router/database.js";
 import env from "dotenv";
+import Book from "../Book/Book.js";
 
 env.config();
 
@@ -90,6 +91,11 @@ class User {
             RETURNING *
         `
         try {
+            const type = ["like", "bookMark", "rating"]
+            if (!type.includes(interaction_type)) {
+                throw new Error(`type chỉ được một trong những loại sau: ${type.join(", ")}`)
+            }
+
             const result = await db.query(query, [book_id, user_id, interaction_type, value])
             return result.rows[0]
         } catch (err) {
