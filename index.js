@@ -5,9 +5,9 @@ import env from "dotenv";
 import InteractionController from "./Service/User/InteractionController.js";
 import Auth from "./Service/Auth/AuthController.js";
 import UserController from "./Service/User/UserController.js";
-import BookController from "./Service/BookController/BookController.js";
-import VolumeController from "./Service/BookController/VolumeController.js";
-import ChapterController from "./Service/BookController/ChapterController.js";
+import BookController from "./Service/Books/BookController.js";
+import VolumeController from "./Service/Books/VolumeController.js";
+import ChapterController from "./Service/Books/ChapterController.js";
 
 
 env.config();
