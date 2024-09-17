@@ -4,6 +4,22 @@ import fs from "fs"
 import Book from "./Book.js";
 
 class Chapter {
+    chapter_id
+    chapter_name
+    created_at
+
+    async init(chapterID){
+        const chapter = await Chapter.findById(chapterID)
+
+        const chapter_id = chapter.chapter_id
+        const chapter_name = chapter.chapter_name
+        const created_at = chapter.created_at
+
+        this.chapter_id = chapter_id;
+        this.chapter_name = chapter_name;
+        this.created_at = created_at;
+    }
+
     static async create(name, content, volumeID, BookID) {
         const query = `
             INSERT INTO chapters (chapter_name, content, volume_id, book_id, chapter_number)
@@ -37,7 +53,7 @@ class Chapter {
         }
     }
 
-    static async findByid(id) {
+    static async findById(id) {
         const query = `
             SELECT *
             FROM chapters
@@ -47,7 +63,22 @@ class Chapter {
             const result = await db.query(query, [id])
             return result.rows[0];
         } catch (err) {
-            console.error('Error creating chapter:', err);
+            console.error('Error finding chapter:', err);
+            throw err;
+        }
+    }
+
+    static async findByVolumeId(volumeID) {
+        const query = `
+            SELECT *
+            FROM chapters
+            WHERE volume_id = $1
+        `
+        try {
+            const result = await db.query(query, [volumeID])
+            return result.rows;
+        } catch (err) {
+            console.error('Error finding chapter:', err);
             throw err;
         }
     }

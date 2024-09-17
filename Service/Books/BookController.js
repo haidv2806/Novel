@@ -10,7 +10,6 @@ BookController.post("/create", async (req, res, cb) => {
     const artist = req.body.artist
     const status = req.body.status
     const decription = req.body.decription
-
     try {
         const result = await Book.create(name, author, artist, status, decription)
         res.status(200).json({ result: true, message: "tạo bộ sách mới thành công", book: result })
@@ -32,8 +31,10 @@ BookController.post("/create", async (req, res, cb) => {
 BookController.get("/:bookId", async (req, res) => {
     const bookid = req.params.bookId
     try {
-        const result = await Book.findById(bookid)     
-        res.status(200).json({ result: true, message: "tìm kiếm sách thông quaID thành công", Book: result})
+        const book = new Book();
+        await book.init(bookid);
+        
+        res.status(200).json({ result: true, message: "tìm kiếm sách thông quaID thành công", Book: book})
     } catch (err) {
         return res.status(500).json({ result: false, message: "Đã xảy ra lỗi tìm sách bằng ID", error: err.message });
     }

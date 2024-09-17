@@ -6,6 +6,60 @@ import Artist from "../Person/Artist.js";
 
 
 class Book {
+    book_id
+    book_name
+    volumes
+    author
+    artist
+    trans_name
+    status
+    description
+    total_index
+    average_rating
+    rating_count
+    views
+    likes
+
+    constructor() {
+        this.volumes = []
+    }
+
+    async init(BookID) {
+        const book = await Book.findById(BookID)
+
+        if (book) {
+            const author_name = await Author.findById(book.author_id)
+            const artist_name = await Artist.findById(book.artist_id)
+
+
+            this.book_id = book.book_id
+            this.book_name = book.book_name
+            this.author = author_name
+            this.artist = artist_name
+            this.status = book.status
+            this.description = book.description
+            this.total_index = book.total_index
+            this.average_rating = book.average_rating
+            this.rating_count = book.rating_count
+            this.views = book.views
+            this.likes = book.likes
+
+            // Lấy tất cả volumes và khởi tạo chúng bất đồng bộ
+            const allVolumes = await Volume.findByBookId(BookID);
+            for (const volumeData of allVolumes) {
+                const volume = new Volume(); // Tạo volume
+                await volume.init(volumeData.volume_id); // Khởi tạo bất đồng bộ cho volume
+                this.volumes.push(volume); // Thêm volume vào danh sách
+            }
+
+            return this;
+        } else {
+            throw new Error("Book not found");
+        }
+    }
+
+
+
     static async create(name, author, artist, status, decription) {
         const query = `
             INSERT INTO books (book_name, author_id, artist_id, status, description)
@@ -154,7 +208,7 @@ class Book {
         const query = ` 
             SELECT book_id, ts_rank(search_text_vector, plainto_tsquery('vietnamese', $1)) AS rank
             FROM search
-            WHERE search_text_vector @@ plainto_tsquery('vietnamese', $1)
+            WHERE search_text_vector @@ plainto_tsquery('vietnamese', (search_text %> $1))
             OR search_text %> $1
             ORDER BY rank
             LIMIT 10 OFFSET $2;
@@ -164,13 +218,13 @@ class Book {
             if (!search.rows[0]) {
                 throw new Error("Không tìm thấy kết quả nào")
             }
-            
+
             const result = [];
             for (let i = 0; i < search.rows.length; i++) {
                 const book = await Book.findById(search.rows[i].book_id);
                 result.push(book);
             }
-            
+
             return result
         } catch (err) {
             console.error('Error finding book by name:', err);
@@ -234,7 +288,7 @@ class Book {
         }
     }
 
-    static async addTotalIndex(id, indexNumber){
+    static async addTotalIndex(id, indexNumber) {
         const query = `
             UPDATE books
             SET total_index = COALESCE(total_index, 0) + $2
@@ -243,7 +297,7 @@ class Book {
         `
         try {
             console.log(id, indexNumber);
-            
+
             const result = await db.query(query, [id, indexNumber])
             return result.rows[0]
         } catch (err) {
@@ -252,7 +306,7 @@ class Book {
         }
     }
 
-    static async addView(id){
+    static async addView(id) {
         const query = `
             UPDATE books
             SET views = COALESCE(views, 0) + 1
