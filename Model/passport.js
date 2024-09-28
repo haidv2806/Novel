@@ -21,25 +21,16 @@ passport.use(
       //kiểm tra xem có email ko
       const checkEmail = await User.findByEmail(email)
 
-      if (checkEmail) {
-        const storedHashedPassword = checkEmail.password;   
-        bcrypt.compare(password, storedHashedPassword, (err, valid) => {
-          if (err) {
-            console.error("Error comparing passwords:", err);
-            return cb(err);
-          } else {
-            if (valid) {
-              const payload = { user_id: checkEmail.user_id, email: checkEmail.email };
-              const token = jwt.sign(payload, secretOrKey, { expiresIn: expiresToken });
-              return cb(null, token ,checkEmail);
-            } else {
-              return cb(null, false);
-            }
-          }
-        });
+      const user = new User()
+      await user.init(checkEmail.user_id)
+      const valid = await user.comparePassword(password)
 
+      if (valid) {
+        const payload = { user_id: checkEmail.user_id, email: checkEmail.email };
+        const token = jwt.sign(payload, secretOrKey, { expiresIn: expiresToken });
+        return cb(null, token, user);
       } else {
-        return cb(null, false, { message: 'Email không tồn tại' });
+        return cb(null, false, { message: 'Sai mật khẩu' });
       }
     } catch (err) {
       console.log(err);

@@ -1,6 +1,7 @@
 import express, { json, response} from "express";
 import session from "express-session";
 import env from "dotenv";
+import cors from "cors";
 
 import InteractionController from "./Service/User/InteractionController.js";
 import Auth from "./Service/Auth/AuthController.js";
@@ -24,6 +25,8 @@ app.use(
       }
     })
   )
+
+app.use(cors());
 
   
 // Middleware để xử lý dữ liệu dạng URL-encoded và JSON
