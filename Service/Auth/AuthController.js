@@ -14,14 +14,13 @@ Auth.post("/sign_in", async (req, res, cb) => {
             // Nếu không có user, trả về result: false với message từ info hoặc thông báo mặc định
             return res.status(401).json({ result: false, message: info?.message || 'Đăng nhập thất bại' });
         }
-        console.log(user);
         // Nếu token không hợp lệ hoặc là false, trả về result: false
         if (!token) {
             return res.status(401).json({ result: false, message: 'Xác thực thất bại' });
         }
 
         // Đăng nhập thành công
-        res.json({ result: true, message: 'đã xác thực', token: `Bearer ${token}`, user });
+        res.json({ result: true, message: 'đã xác thực', token: token, user });
     })(req, res, cb);
 });
 

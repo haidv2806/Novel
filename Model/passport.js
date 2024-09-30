@@ -9,6 +9,7 @@ import env from "dotenv";
 env.config();
 const secretOrKey = process.env.SECRET_AUTH_TOKEN_KEY
 const expiresToken = process.env.EXPIRES_TOKEN
+const expiresRefreshToken = process.env.EXPIRES_REFRESH_TOKEN
 
 passport.use(
   "login",
@@ -26,8 +27,12 @@ passport.use(
       const valid = await user.comparePassword(password)
 
       if (valid) {
-        const payload = { user_id: checkEmail.user_id, email: checkEmail.email };
-        const token = jwt.sign(payload, secretOrKey, { expiresIn: expiresToken });
+        const refreshToken = await refreshTokenGenerate(user.user_id)
+        const accessToken = await accessTokenGenerate(user.user_id)
+        const token = {
+          refreshToken: refreshToken,
+          accessToken: accessToken,
+        }
         return cb(null, token, user);
       } else {
         return cb(null, false, { message: 'Sai mật khẩu' });
@@ -37,6 +42,20 @@ passport.use(
     }
   })
 );
+
+async function accessTokenGenerate(id){
+  const user = await User.findById(id)
+
+  const payload = { user_id: user.user_id, email: user.email, name: user.user_name };
+  const accessToken = jwt.sign(payload, secretOrKey, { expiresIn: expiresToken });
+  return accessToken
+}
+
+async function refreshTokenGenerate(id){
+  const payload = { user_id: id};
+  const refreshToken = jwt.sign(payload, secretOrKey, { expiresIn: expiresRefreshToken });
+  return refreshToken
+}
 
 // JWT strategy
 const option = {

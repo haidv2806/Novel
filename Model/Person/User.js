@@ -41,7 +41,7 @@ class User {
 
     static async create(email, password, name) {
         const query = `
-            INSERT INTO users (email, password, user_name, avatar)
+            INSERT INTO users (email, user_name, avatar)
             VALUES ($1, $2, $3, $4)
             RETURNING user_id, email, user_name, avatar;
         `
