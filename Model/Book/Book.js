@@ -8,6 +8,7 @@ import Artist from "../Person/Artist.js";
 class Book {
     book_id
     book_name
+    book_image
     volumes
     author
     artist
@@ -19,6 +20,7 @@ class Book {
     rating_count
     views
     likes
+    latest_update
 
     constructor() {
         this.volumes = []
@@ -34,6 +36,7 @@ class Book {
 
             this.book_id = book.book_id
             this.book_name = book.book_name
+            this.book_image = book.book_image
             this.author = author_name
             this.artist = artist_name
             this.status = book.status
@@ -43,6 +46,7 @@ class Book {
             this.rating_count = book.rating_count
             this.views = book.views
             this.likes = book.likes
+            this.latest_update = book.latest_update
 
             // Lấy tất cả volumes và khởi tạo chúng bất đồng bộ
             const allVolumes = await Volume.findByBookId(BookID);
@@ -131,9 +135,8 @@ class Book {
 
     static async findByView(page) {
         const query = `
-            SELECT book_name, image_path, author_name
+            SELECT books.book_id, book_name, book_image, author_name
             FROM books 
-                INNER JOIN image ON books.book_id = image.book_id
                 INNER JOIN authors ON books.author_id = authors.author_id
             ORDER BY views DESC
             LIMIT 10 OFFSET $1
@@ -149,9 +152,8 @@ class Book {
 
     static async findByLike(page) {
         const query = `
-            SELECT book_name, image_path, author_name
+            SELECT book_name, book_image, author_name
             FROM books 
-                INNER JOIN image ON books.book_id = image.book_id
                 INNER JOIN authors ON books.author_id = authors.author_id
             ORDER BY likes DESC
             LIMIT 10 OFFSET $1
@@ -167,9 +169,8 @@ class Book {
 
     static async findByRating(page) {
         const query = `
-            SELECT book_name, image_path, author_name
+            SELECT book_name, book_image, author_name
             FROM books 
-                INNER JOIN image ON books.book_id = image.book_id
                 INNER JOIN authors ON books.author_id = authors.author_id
             ORDER BY average_rating DESC
             LIMIT 10 OFFSET $1
@@ -185,9 +186,8 @@ class Book {
 
     static async findByGenre(genre, page) {
         const query = `
-            SELECT book_name, image_path, author_name
+            SELECT book_name, book_image, author_name
             FROM books 
-                INNER JOIN image ON books.book_id = image.book_id
                 INNER JOIN authors ON books.author_id = authors.author_id
                 INNER JOIN books_categories ON books.book_id = books_categories.book_id
                 INNER JOIN categories ON books.category_id = categories.category_id
@@ -234,9 +234,8 @@ class Book {
 
     static async findByAuthor(author, page) {
         const query = `
-            SELECT book_name, image_path, author_name
+            SELECT book_name, book_image, author_name
             FROM books
-                INNER JOIN image ON books.book_id = image.book_id
                 INNER JOIN authors ON books.author_id = authors.author_id
             WHERE author_name = $1
             LIMIT 10 OFFSET $2
@@ -252,9 +251,8 @@ class Book {
 
     static async findByArtist(artist, page) {
         const query = `
-            SELECT book_name, image_path, author_name, artist_name
+            SELECT book_name, book_image, author_name, artist_name
             FROM books 
-                INNER JOIN image ON books.book_id = image.book_id
                 INNER JOIN authors ON books.author_id = authors.author_id
                 INNER JOIN artists ON books.artist_id = artists.artist_id
             WHERE author_name = $1
@@ -271,9 +269,8 @@ class Book {
 
     static async findByTrans(trans, page) {
         const query = `
-        SELECT book_name, image_path, author_name, artist_name
+        SELECT book_name, book_image, author_name, artist_name
         FROM books 
-            INNER JOIN image ON books.book_id = image.book_id
             INNER JOIN authors ON books.author_id = authors.author_id
             INNER JOIN users ON books.user_id = users.user_id
         WHERE author_name = $1

@@ -83,7 +83,7 @@ class Chapter {
         }
     }
 
-    static async getContentByid(id) {
+    static async getContentById(id) {
         const query = `
             SELECT content
             FROM chapters

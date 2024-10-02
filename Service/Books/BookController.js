@@ -43,6 +43,20 @@ BookController.get("/:bookId", async (req, res) => {
 // sử dụng
 // gửi get vào: BaseURL/Book/<INT>
 
+BookController.get("/View/:page", async (req, res) => {
+    const page = req.params.page || 1
+    try {
+        const book = await Book.findByView(page)
+        res.status(200).json({ result: true, message: "tìm kiếm sách thông qua số lượng view thành công", Book: book})
+    } catch (err) {
+        return res.status(500).json({ result: false, message: "Đã xảy ra lỗi khi lấy danh sách bộ sách", error: err.message });
+    }
+})
+
+// sử dụng
+// gửi get vào: BaseURL/Book/View/<INT>
+
+
 BookController.post("/search", async (req, res) => {
     const name = req.body.name
     const page = parseInt(req.params.page) || 1;  // Kiểm tra và đặt giá trị mặc định cho page

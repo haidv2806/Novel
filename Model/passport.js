@@ -22,31 +22,40 @@ passport.use(
       //kiểm tra xem có email ko
       const checkEmail = await User.findByEmail(email)
 
-      const user = new User()
-      await user.init(checkEmail.user_id)
-      const valid = await user.comparePassword(password)
-
-      if (valid) {
-        const refreshToken = await refreshTokenGenerate(user.user_id)
-        const accessToken = await accessTokenGenerate(user.user_id)
-        const token = {
-          refreshToken: refreshToken,
-          accessToken: accessToken,
+      if (checkEmail){
+        const user = new User()
+        await user.init(checkEmail.user_id)
+        const valid = await user.comparePassword(password)
+  
+        if (valid) {
+          const refreshToken = await refreshTokenGenerate(user.user_id)
+          const accessToken = await accessTokenGenerate(user)
+          const token = {
+            refreshToken: refreshToken,
+            accessToken: accessToken,
+          }
+          return cb(null, token, user);
+        } else {
+          return cb(null, false, { message: 'Sai mật khẩu' });
         }
-        return cb(null, token, user);
       } else {
-        return cb(null, false, { message: 'Sai mật khẩu' });
+        return cb(null, false, {message: 'Không tồn tại người dùng'})
       }
+
     } catch (err) {
       console.log(err);
     }
   })
 );
 
-async function accessTokenGenerate(id){
-  const user = await User.findById(id)
+// passport.use(
+//   "token",
+  
+// )
 
-  const payload = { user_id: user.user_id, email: user.email, name: user.user_name };
+async function accessTokenGenerate(data){
+
+  const payload = { user_id: data.user_id, email: data.email, name: data.user_name };
   const accessToken = jwt.sign(payload, secretOrKey, { expiresIn: expiresToken });
   return accessToken
 }

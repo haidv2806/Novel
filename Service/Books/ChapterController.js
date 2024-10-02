@@ -31,7 +31,7 @@ ChapterController.post("/create", async (req, res, cb) => {
 ChapterController.get("/:chapterId", async (req, res) => {
     const chapterId = req.params.chapterId;
     try {
-      const result = await Chapter.findByid(chapterId)
+      const result = await Chapter.findById(chapterId)
       res.status(200).json({ result: true, message: "tìm kiếm chapter bằng ID thành công", chapter: result});
     } catch (err) {
       res.status(500).json({ result: false, message: "Đã xảy ra lỗi khi lấy chapter", error: err.message });
@@ -44,7 +44,7 @@ ChapterController.get("/:chapterId", async (req, res) => {
 ChapterController.get("/Content/:chapterId", async (req, res) => {
     const chapterId = req.params.chapterId;
     try {
-        const result = await Chapter.getContentByid(chapterId)
+        const result = await Chapter.getContentById(chapterId)
         res.status(200).json({ result: true, message: "tìm kiếm content bằng ID thành công", chapter: result});
     } catch (err) {
         res.status(500).json({ result: false, message: "Đã xảy ra lỗi khi lấy content của chapter", error: err.message });

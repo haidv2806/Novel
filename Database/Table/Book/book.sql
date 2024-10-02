@@ -1,6 +1,7 @@
 CREATE TABLE books (
     book_id SERIAL PRIMARY KEY,
     book_name VARCHAR (100) NOT NULL,
+    book_image VARCHAR(255) NOT NULL,
     author_id INT NOT NULL,
     artist_id INT NOT NULL,
     trans_id INT,
@@ -11,6 +12,7 @@ CREATE TABLE books (
     rating_count INT,
     views INT,
     likes INT,
+    latest_update TIMESTAMP,
 
     FOREIGN KEY (author_id) REFERENCES authors(author_id),
     FOREIGN KEY (artist_id) REFERENCES artists(artist_id),

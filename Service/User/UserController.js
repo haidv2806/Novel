@@ -50,7 +50,7 @@ UserController.post("/name", passport.authenticate('jwt', { session: false, opti
 UserController.get("/bookMark", passport.authenticate('jwt', { session: false, optional: false }),
     async (req, res, cb) => {
         try {
-            const page = req.params.page || 1     
+            const page = req.params.page || 1   
             const result = await User.checkBookMark(req.user.user_id, page)
 
             res.status(200).json({ result: true, message: 'tìm bookMark thành công', user: req.user, books: result });
