@@ -79,4 +79,10 @@ Auth.post(
     }
   );
 
+// Sử dụng
+// truyền dữ liệu vào body:
+// {
+//   "refreshToken": <token>
+// }
+
 export default Auth

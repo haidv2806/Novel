@@ -152,7 +152,7 @@ class Book {
 
     static async findByLike(page) {
         const query = `
-            SELECT book_name, book_image, author_name
+            SELECT books.book_id, book_name, book_image, author_name
             FROM books 
                 INNER JOIN authors ON books.author_id = authors.author_id
             ORDER BY likes DESC
@@ -169,7 +169,7 @@ class Book {
 
     static async findByRating(page) {
         const query = `
-            SELECT book_name, book_image, author_name
+            SELECT books.book_id, book_name, book_image, author_name
             FROM books 
                 INNER JOIN authors ON books.author_id = authors.author_id
             ORDER BY average_rating DESC
@@ -186,7 +186,7 @@ class Book {
 
     static async findByGenre(genre, page) {
         const query = `
-            SELECT book_name, book_image, author_name
+            SELECT books.book_id, book_name, book_image, author_name
             FROM books 
                 INNER JOIN authors ON books.author_id = authors.author_id
                 INNER JOIN books_categories ON books.book_id = books_categories.book_id
@@ -199,6 +199,25 @@ class Book {
             return result.rows
         } catch (err) {
             console.error('Error finding book by genre:', err);
+            throw err;
+        }
+    }
+
+    static async findByIdForSearch(id) {
+        const query = `
+            SELECT books.book_id, book_name, book_image, author_name
+            FROM books
+                INNER JOIN authors ON books.author_id = authors.author_id
+            WHERE book_id = $1
+        `
+        try {
+            const result = await db.query(query, [id])
+            if (!result.rows[0]) {
+                throw new Error("Không tồn tại id")
+            }
+            return result.rows[0];
+        } catch (err) {
+            console.error('Error finding book by id:', err);
             throw err;
         }
     }
@@ -221,7 +240,7 @@ class Book {
 
             const result = [];
             for (let i = 0; i < search.rows.length; i++) {
-                const book = await Book.findById(search.rows[i].book_id);
+                const book = await Book.findByIdForSearch(search.rows[i].book_id);
                 result.push(book);
             }
 
@@ -234,7 +253,7 @@ class Book {
 
     static async findByAuthor(author, page) {
         const query = `
-            SELECT book_name, book_image, author_name
+            SELECT books.book_id, book_name, book_image, author_name
             FROM books
                 INNER JOIN authors ON books.author_id = authors.author_id
             WHERE author_name = $1
@@ -251,7 +270,7 @@ class Book {
 
     static async findByArtist(artist, page) {
         const query = `
-            SELECT book_name, book_image, author_name, artist_name
+            SELECT books.book_id, book_name, book_image, author_name, artist_name
             FROM books 
                 INNER JOIN authors ON books.author_id = authors.author_id
                 INNER JOIN artists ON books.artist_id = artists.artist_id
@@ -269,7 +288,7 @@ class Book {
 
     static async findByTrans(trans, page) {
         const query = `
-        SELECT book_name, book_image, author_name, artist_name
+        SELECT books.book_id, book_name, book_image, author_name, artist_name
         FROM books 
             INNER JOIN authors ON books.author_id = authors.author_id
             INNER JOIN users ON books.user_id = users.user_id
