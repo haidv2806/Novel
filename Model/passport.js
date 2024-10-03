@@ -48,10 +48,38 @@ passport.use(
   })
 );
 
-// passport.use(
-//   "token",
-  
-// )
+passport.use(
+  "token",
+  new JwtStrategy(
+    {
+      jwtFromRequest: ExtractJwt.fromBodyField("refreshToken"), // Lấy refresh token từ body request
+      secretOrKey: secretOrKey,
+      passReqToCallback: true,
+    },
+    async (req, payload, done) => {
+      try {
+        // Xác thực và kiểm tra tính hợp lệ của refresh token
+        const user = await User.findById(payload.user_id); // Tìm người dùng dựa trên payload từ refresh token
+
+        if (!user) {
+          return done(null, false, { message: "Người dùng không tồn tại" });
+        }
+
+        // Tạo mới access token
+        const newAccessToken = await accessTokenGenerate({
+          user_id: user.user_id,
+          email: user.email,
+          user_name: user.user_name,
+        });
+
+        // Trả về access token mới
+        return done(null, { accessToken: newAccessToken }, { message: "Gia hạn token thành công" });
+      } catch (error) {
+        return done(error, false);
+      }
+    }
+  )
+);
 
 async function accessTokenGenerate(data){
 

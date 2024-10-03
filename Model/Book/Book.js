@@ -208,7 +208,7 @@ class Book {
         const query = ` 
             SELECT book_id, ts_rank(search_text_vector, plainto_tsquery('vietnamese', $1)) AS rank
             FROM search
-            WHERE search_text_vector @@ plainto_tsquery('vietnamese', (search_text %> $1))
+            WHERE search_text_vector @@ plainto_tsquery('vietnamese', $1)
             OR search_text %> $1
             ORDER BY rank
             LIMIT 10 OFFSET $2;

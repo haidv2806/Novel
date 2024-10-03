@@ -58,10 +58,10 @@ BookController.get("/View/:page", async (req, res) => {
 
 
 BookController.post("/search", async (req, res) => {
-    const name = req.body.name
+    const search = req.body.search
     const page = parseInt(req.params.page) || 1;  // Kiểm tra và đặt giá trị mặc định cho page
     try {
-        const result = await Book.findBySearchName(name, page)
+        const result = await Book.findBySearchName(search, page)
         res.status(200).json({ result: true, message: "tìm kiếm sách thông qua tên thành công", Book: result})
     } catch (err) {
         return res.status(500).json({ result: false, message: "Đã xảy ra lỗi tìm sách bằng tên", error: err.message });
@@ -72,7 +72,7 @@ BookController.post("/search", async (req, res) => {
 // gửi post vào: BaseURL/Book/<INT>
 // Truyền dữ liệu vào body
 // {
-// name: string
+// search: string
 // }
 
 

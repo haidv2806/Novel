@@ -65,4 +65,18 @@ Auth.post("/sign_up", async (req, res, cb) => {
 //   "password": string
 // }
 
+// Route xử lý yêu cầu gia hạn token
+Auth.post(
+    "/token",
+    passport.authenticate("token", { session: false }),
+    (req, res) => {
+      // Sau khi xác thực thành công, passport sẽ gửi dữ liệu access token mới qua req.user
+      return res.status(200).json({
+        result: true,
+        message: "Gia hạn token thành công",
+        accessToken: req.user.accessToken,
+      });
+    }
+  );
+
 export default Auth
