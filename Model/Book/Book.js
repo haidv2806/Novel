@@ -19,7 +19,7 @@ class Book {
     average_rating
     rating_count
     views
-    likes
+    folow
     latest_update
 
     constructor() {
@@ -32,6 +32,10 @@ class Book {
         if (book) {
             const author_name = await Author.findById(book.author_id)
             const artist_name = await Artist.findById(book.artist_id)
+            const total_views = await Book.countView(book.book_id)
+            const rating = await Book.ratingStatus(book.book_id)
+            const total_follows = await Book.countFollow(book.book_id)
+            const last_update = await Book.checkLastUpdate(book.book_id)
 
 
             this.book_id = book.book_id
@@ -42,11 +46,12 @@ class Book {
             this.status = book.status
             this.description = book.description
             this.total_index = book.total_index
-            this.average_rating = book.average_rating
-            this.rating_count = book.rating_count
-            this.views = book.views
-            this.likes = book.likes
-            this.latest_update = book.latest_update
+            
+            this.average_rating = rating.average_rating
+            this.rating_count = rating.rating_count
+            this.views = total_views
+            this.folow = total_follows
+            this.latest_update = last_update
 
             // Lấy tất cả volumes và khởi tạo chúng bất đồng bộ
             const allVolumes = await Volume.findByBookId(BookID);
@@ -64,10 +69,10 @@ class Book {
 
 
 
-    static async create(name, author, artist, status, decription) {
+    static async create(name, book_image, author, artist, status, decription) {
         const query = `
-            INSERT INTO books (book_name, author_id, artist_id, status, description)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO books (book_name, book_image, author_id, artist_id, status, description)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING book_id, book_name
         `
         try {
@@ -75,7 +80,7 @@ class Book {
             const author_id = checkAuthor.author_id
             const checkArtist = await Artist.checkExist(artist)
             const artist_id = checkArtist.artist_id
-            const result = await db.query(query, [name, author_id, artist_id, status, decription])
+            const result = await db.query(query, [name, book_image, author_id, artist_id, status, decription])
             return result.rows[0];
         } catch (err) {
             console.error('Error creating book:', err);
@@ -322,18 +327,65 @@ class Book {
         }
     }
 
-    static async addView(id) {
+    static async countView(id) {
         const query = `
-            UPDATE books
-            SET views = COALESCE(views, 0) + 1
-            WHERE book_id = $1
-            RETURNING * 
+            SELECT COUNT(*) AS total_views
+            FROM user_interactions
+            WHERE interaction_type = 'view'
+            AND book_id = $1
         `
         try {
             const result = await db.query(query, [id])
-            return result.rows[0]
+            return result.rows[0].total_views
         } catch (err) {
-            console.error('Error update View', err);
+            console.error('Error count View', err);
+            throw err;
+        }
+    }
+
+    static async countFollow(id){
+        const query = `
+            SELECT COUNT(*) AS total_follows
+            FROM user_interactions
+            WHERE interaction_type = 'follow'
+            AND book_id = $1
+        `
+        try {
+            const result = await db.query(query, [id])
+            return result.rows[0].total_follows
+        } catch (err) {
+            console.error('Error count follow', err);
+            throw err;
+        }
+    }
+
+    static async ratingStatus(id) {
+        const query = `
+            SELECT COUNT(*) AS total_rating, AVG(CAST(value AS FLOAT)) AS average_rating
+            FROM user_interactions
+            WHERE interaction_type = 'rating'
+            AND book_id = $1
+        `;
+        try {
+            const result = await db.query(query, [id]);
+            return result.rows[0];
+        } catch (err) {
+            console.error('Error handler rating', err);
+            throw err;
+        }
+    }
+
+    static async checkLastUpdate(bookId) {
+        const query = `
+            SELECT MAX(created_at) AS last_update
+            FROM chapters
+            WHERE book_id = $1
+        `;
+        try {
+            const result = await db.query(query, [bookId]);
+            return result.rows[0].last_update;
+        } catch (err) {
+            console.error('Error checking last update', err);
             throw err;
         }
     }

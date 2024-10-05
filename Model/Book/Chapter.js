@@ -2,6 +2,7 @@ import db from "../../Service/database.js";
 import mammoth from "mammoth";
 import fs from "fs"
 import Book from "./Book.js";
+import User from "../Person/User.js"
 
 class Chapter {
     chapter_id
@@ -95,11 +96,6 @@ class Chapter {
             if (result.rows.length === 0) {
                 throw new Error('Chapter not found');
             }
-
-            // thêm 1 view
-            const chapter = await Chapter.findByid(id)
-            const book_id = chapter.book_id
-            const addView = await Book.addView(book_id)
 
             const filePath = result.rows[0].content;
 

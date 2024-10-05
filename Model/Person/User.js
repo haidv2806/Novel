@@ -137,7 +137,7 @@ class User {
             RETURNING *
         `
         try {
-            const type = ["like", "bookMark", "rating"]
+            const type = ["follow", "rating" , "view"]
             if (!type.includes(interaction_type)) {
                 throw new Error(`type chỉ được một trong những loại sau: ${type.join(", ")}`)
             } else if (interaction_type == "rating" & value > 5) {

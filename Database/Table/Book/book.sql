@@ -8,11 +8,6 @@ CREATE TABLE books (
     status VARCHAR (50) NOT NULL,
     description TEXT NOT NULL,
     total_index INT,
-    average_rating DECIMAL(3, 2),
-    rating_count INT,
-    views INT,
-    likes INT,
-    latest_update TIMESTAMP,
 
     FOREIGN KEY (author_id) REFERENCES authors(author_id),
     FOREIGN KEY (artist_id) REFERENCES artists(artist_id),

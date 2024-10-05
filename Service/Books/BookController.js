@@ -6,12 +6,13 @@ const BookController = express.Router();
 
 BookController.post("/create", async (req, res, cb) => {
     const name = req.body.name
+    const image = req.body.image
     const author = req.body.author
     const artist = req.body.artist
     const status = req.body.status
     const decription = req.body.decription
     try {
-        const result = await Book.create(name, author, artist, status, decription)
+        const result = await Book.create(name, image, author, artist, status, decription)
         res.status(200).json({ result: true, message: "tạo bộ sách mới thành công", book: result })
     } catch (err) {
         return res.status(500).json({ result: false, message: "Đã xảy ra lỗi khi tạo sách mới", error: err.message });
@@ -22,6 +23,7 @@ BookController.post("/create", async (req, res, cb) => {
 // truyền dữ liệu vào body:
 // {
 //   "name": string,
+//   "image": string,
 //   "author": string,
 //   "artist": string,
 //   "status": string,
