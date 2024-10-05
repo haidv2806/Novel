@@ -140,10 +140,14 @@ class Book {
 
     static async findByView(page) {
         const query = `
-            SELECT books.book_id, book_name, book_image, author_name
-            FROM books 
-                INNER JOIN authors ON books.author_id = authors.author_id
-            ORDER BY views DESC
+            SELECT books.book_id, book_name, book_image, author_name, 
+                COUNT(user_interactions.interaction_id) AS total_views
+            FROM books
+            INNER JOIN authors ON books.author_id = authors.author_id
+            LEFT JOIN user_interactions ON books.book_id = user_interactions.book_id
+                AND user_interactions.interaction_type = 'view'
+            GROUP BY books.book_id, book_name, book_image, author_name
+            ORDER BY total_views DESC
             LIMIT 10 OFFSET $1
         `
         try {
@@ -157,34 +161,42 @@ class Book {
 
     static async findByLike(page) {
         const query = `
-            SELECT books.book_id, book_name, book_image, author_name
-            FROM books 
-                INNER JOIN authors ON books.author_id = authors.author_id
-            ORDER BY likes DESC
+            SELECT books.book_id, book_name, book_image, author_name, 
+                   COUNT(user_interactions.interaction_id) AS total_likes
+            FROM books
+            INNER JOIN authors ON books.author_id = authors.author_id
+            LEFT JOIN user_interactions ON books.book_id = user_interactions.book_id
+                AND user_interactions.interaction_type = 'like'
+            GROUP BY books.book_id, book_name, book_image, author_name
+            ORDER BY total_likes DESC
             LIMIT 10 OFFSET $1
-        `
+        `;
         try {
-            const result = await db.query(query, [(page * 10) - 10])
-            return result.rows
+            const result = await db.query(query, [(page * 10) - 10]);
+            return result.rows;
         } catch (err) {
-            console.error('Error finding book by like:', err);
+            console.error('Error finding books by like:', err);
             throw err;
         }
     }
 
     static async findByRating(page) {
         const query = `
-            SELECT books.book_id, book_name, book_image, author_name
-            FROM books 
-                INNER JOIN authors ON books.author_id = authors.author_id
+            SELECT books.book_id, book_name, book_image, author_name, 
+                   AVG(CAST(user_interactions.value AS FLOAT)) AS average_rating
+            FROM books
+            INNER JOIN authors ON books.author_id = authors.author_id
+            LEFT JOIN user_interactions ON books.book_id = user_interactions.book_id
+                AND user_interactions.interaction_type = 'rating'
+            GROUP BY books.book_id, book_name, book_image, author_name
             ORDER BY average_rating DESC
             LIMIT 10 OFFSET $1
-        `
+        `;
         try {
-            const result = await db.query(query, [(page * 10) - 10])
-            return result.rows
+            const result = await db.query(query, [(page * 10) - 10]);
+            return result.rows;
         } catch (err) {
-            console.error('Error finding book by rating:', err);
+            console.error('Error finding books by rating:', err);
             throw err;
         }
     }
