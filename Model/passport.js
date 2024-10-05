@@ -1,7 +1,10 @@
 import bcrypt from "bcrypt";
 import passport from "passport";
 import { Strategy } from "passport-local";
+
 import User from "./Person/User.js";
+import RefreshToken from './RefreshToken.js'
+
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import jwt from 'jsonwebtoken';
 import env from "dotenv";
@@ -22,14 +25,17 @@ passport.use(
       //kiểm tra xem có email ko
       const checkEmail = await User.findByEmail(email)
 
-      if (checkEmail){
+      if (checkEmail) {
         const user = new User()
         await user.init(checkEmail.user_id)
         const valid = await user.comparePassword(password)
-  
+
         if (valid) {
           const refreshToken = await refreshTokenGenerate(user.user_id)
           const accessToken = await accessTokenGenerate(user)
+
+          await RefreshToken.create(refreshToken, user.user_id)
+
           const token = {
             refreshToken: refreshToken,
             accessToken: accessToken,
@@ -39,7 +45,7 @@ passport.use(
           return cb(null, false, { message: 'Sai mật khẩu' });
         }
       } else {
-        return cb(null, false, {message: 'Không tồn tại người dùng'})
+        return cb(null, false, { message: 'Không tồn tại người dùng' })
       }
 
     } catch (err) {
@@ -57,23 +63,34 @@ passport.use(
       passReqToCallback: true,
     },
     async (req, payload, done) => {
+
       try {
-        // Xác thực và kiểm tra tính hợp lệ của refresh token
-        const user = await User.findById(payload.user_id); // Tìm người dùng dựa trên payload từ refresh token
+        // Lấy refresh token từ body
+        const refreshToken = req.body.refreshToken;
 
-        if (!user) {
-          return done(null, false, { message: "Người dùng không tồn tại" });
+        // Kiểm tra xem refresh token có hợp lệ hay không
+        const isValid = await RefreshToken.findOne(refreshToken);
+
+        if (isValid) {
+          // Xác thực và kiểm tra tính hợp lệ của refresh token
+          const user = await User.findById(payload.user_id); // Tìm người dùng dựa trên payload từ refresh token
+
+          if (!user) {
+            return done(null, false, { message: "Người dùng không tồn tại" });
+          }
+
+          // Tạo mới access token
+          const newAccessToken = await accessTokenGenerate({
+            user_id: user.user_id,
+            email: user.email,
+            user_name: user.user_name,
+          });
+
+          // Trả về access token mới
+          return done(null, { accessToken: newAccessToken }, { message: "Gia hạn token thành công" });
+        } else {
+          return done(null, false, { message: "refeshToken không tồn tại" });
         }
-
-        // Tạo mới access token
-        const newAccessToken = await accessTokenGenerate({
-          user_id: user.user_id,
-          email: user.email,
-          user_name: user.user_name,
-        });
-
-        // Trả về access token mới
-        return done(null, { accessToken: newAccessToken }, { message: "Gia hạn token thành công" });
       } catch (error) {
         return done(error, false);
       }
@@ -81,15 +98,14 @@ passport.use(
   )
 );
 
-async function accessTokenGenerate(data){
-
+async function accessTokenGenerate(data) {
   const payload = { user_id: data.user_id, email: data.email, name: data.user_name };
   const accessToken = jwt.sign(payload, secretOrKey, { expiresIn: expiresToken });
   return accessToken
 }
 
-async function refreshTokenGenerate(id){
-  const payload = { user_id: id};
+async function refreshTokenGenerate(id) {
+  const payload = { user_id: id };
   const refreshToken = jwt.sign(payload, secretOrKey, { expiresIn: expiresRefreshToken });
   return refreshToken
 }

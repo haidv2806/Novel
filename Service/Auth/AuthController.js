@@ -67,17 +67,33 @@ Auth.post("/sign_up", async (req, res, cb) => {
 
 // Route xử lý yêu cầu gia hạn token
 Auth.post(
-    "/token",
-    passport.authenticate("token", { session: false }),
-    (req, res) => {
-      // Sau khi xác thực thành công, passport sẽ gửi dữ liệu access token mới qua req.user
+  "/token",
+  (req, res, next) => {
+    passport.authenticate("token", { session: false }, (err, user, info) => {
+      if (err) {
+        return res.status(500).json({
+          result: false,
+          message: "Đã xảy ra lỗi trong quá trình gia hạn token.",
+          error: err.message,
+        });
+      }
+
+      if (!user) {
+        return res.status(401).json({
+          result: false,
+          message: info?.message || "Xác thực không thành công. Vui lòng đăng nhập lại.",
+        });
+      }
+
+      // Sau khi xác thực thành công, passport sẽ gửi dữ liệu access token mới qua user
       return res.status(200).json({
         result: true,
         message: "Gia hạn token thành công",
-        accessToken: req.user.accessToken,
+        accessToken: user.accessToken,
       });
-    }
-  );
+    })(req, res, next); // Gọi hàm authenticate với req, res, next
+  }
+);
 
 // Sử dụng
 // truyền dữ liệu vào body:
