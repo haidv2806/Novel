@@ -10,9 +10,10 @@ import BookController from "./Service/Books/BookController.js";
 import VolumeController from "./Service/Books/VolumeController.js";
 import ChapterController from "./Service/Books/ChapterController.js";
 
+import { server, app, io } from "./Service/Chat/SocketController.js"
 
 env.config();
-const app = express();
+// const app = express();
 const port = 3000;
 
 app.use(
@@ -24,23 +25,24 @@ app.use(
         maxAge: 1000 * 60 * 60 * 24,
       }
     })
-  )
+);
 
-app.use(cors());
+// Cấu hình CORS để hỗ trợ Socket.io
+app.use(cors({origin: true, credentials: true}));
 
-  
 // Middleware để xử lý dữ liệu dạng URL-encoded và JSON
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use("/Auth", Auth)
-app.use("/User", UserController)
-app.use("/User", InteractionController)
-app.use("/Book", BookController)
-app.use("/Book/Volume", VolumeController)
-app.use("/Book/Volume/Chapter", ChapterController)
+app.use("/Auth", Auth);
+app.use("/User", UserController);
+app.use("/User", InteractionController);
+app.use("/Book", BookController);
+app.use("/Book/Volume", VolumeController);
+app.use("/Book/Volume/Chapter", ChapterController);
 
 
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-  });
+// Khởi động server HTTP để lắng nghe trên cổng 3000
+server.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});

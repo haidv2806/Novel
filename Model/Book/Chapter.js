@@ -86,7 +86,7 @@ class Chapter {
 
     static async getContentById(id) {
         const query = `
-            SELECT content
+            SELECT book_id, content
             FROM chapters
             WHERE chapter_id = $1
         `;
@@ -110,7 +110,10 @@ class Chapter {
                 .split(/\n\s*\n/)  // Regex tách đoạn văn dựa trên dấu xuống dòng kép hoặc khoảng trắng
                 .filter(paragraph => paragraph.trim() !== '');  // Bỏ các đoạn rỗng
 
-            return paragraphs;
+            return {
+                book_id:result.rows[0].book_id,
+                content: paragraphs
+            };
         } catch (err) {
             console.error('Error retrieving chapter content:', err);
             throw err;
