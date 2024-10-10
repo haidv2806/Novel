@@ -53,7 +53,7 @@ newsSocketNamespace.on('connection', (socket) => {
 
   socket.on('send_message', (data) => {
     console.log(data);
-
+    
     // Emit tin nhắn tới tất cả kết nối trong namespace
     newsSocketNamespace.emit("receive_message", {
       id: socket.id,
