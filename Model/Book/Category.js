@@ -36,19 +36,22 @@ class Category {
         }
     }
 
-    static async findAllCategoriessByBookName(book_name){
+    static async findAllCategoriessByBookId(book_id){
         const query =`
-            SELECT categories.category_name
-            FROM books_categories
-                INNER JOIN categories ON categories.category_id = books_categories.category_id
-                INNER JOIN books ON books_categories.book_id = books.book_id
-            WHERE LOWER(book_name) = LOWER($1)
+            SELECT category_name
+            FROM categories
+                INNER JOIN books_categories ON categories.category_id = books_categories.category_id
+            WHERE book_id = $1
         `
         try {
-            const result = await db.query(query, [book_name])
+            const result = await db.query(query, [book_id])
             if (result.rows[0]) {
-                console.log(result.rows);
-                return result.rows
+                let BookGenre = []
+                result.rows.forEach(genre => {
+                    BookGenre.push(genre.category_name)
+                });
+                
+                return BookGenre
             } else {
                 throw new Error ("Không tìm thấy kết quả nào")
             }

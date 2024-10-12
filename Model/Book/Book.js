@@ -10,6 +10,7 @@ class Book {
     book_id
     book_name
     book_image
+    book_genre
     volumes
     author
     artist
@@ -37,11 +38,13 @@ class Book {
             const rating = await Book.ratingStatus(book.book_id)
             const total_follows = await Book.countFollow(book.book_id)
             const last_update = await Book.checkLastUpdate(book.book_id)
+            const bookGenre = await Category.findAllCategoriessByBookId(book.book_id)
 
 
             this.book_id = book.book_id
             this.book_name = book.book_name
             this.book_image = book.book_image
+            this.book_genre = bookGenre
             this.author = author_name
             this.artist = artist_name
             this.status = book.status
