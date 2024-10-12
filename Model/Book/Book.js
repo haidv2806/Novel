@@ -1,4 +1,5 @@
 import db from "../../Service/database.js";
+import Category from "./Category.js";
 import Volume from "./Volume.js";
 import Chapter from "./Chapter.js";
 import Author from "../Person/author.js";
@@ -66,8 +67,6 @@ class Book {
             throw new Error("Book not found");
         }
     }
-
-
 
     static async create(name, book_image, author, artist, status, decription) {
         const query = `
@@ -185,8 +184,8 @@ class Book {
             SELECT books.book_id, book_name, book_image, author_name, 
                    AVG(CAST(user_interactions.value AS FLOAT)) AS average_rating
             FROM books
-            INNER JOIN authors ON books.author_id = authors.author_id
-            LEFT JOIN user_interactions ON books.book_id = user_interactions.book_id
+                INNER JOIN authors ON books.author_id = authors.author_id
+                LEFT JOIN user_interactions ON books.book_id = user_interactions.book_id
                 AND user_interactions.interaction_type = 'rating'
             GROUP BY books.book_id, book_name, book_image, author_name
             ORDER BY average_rating DESC
