@@ -4,6 +4,14 @@ import env from "dotenv";
 import Book from "../Book/Book.js";
 import bcrypt from "bcrypt";
 
+import { fileURLToPath } from 'url';
+import path from 'path';
+import fs from 'fs';
+
+// Tạo __dirname cho ES6
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 env.config();
 
 

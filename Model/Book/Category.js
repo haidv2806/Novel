@@ -5,6 +5,7 @@ class Category {
         const query = `
             INSERT INTO books_categories (book_id, category_id)
             VALUES ($1, $2)
+            RETURNING *
         `
         try {
             const category_id = await Category.findByName(categorie_name)
@@ -45,16 +46,11 @@ class Category {
         `
         try {
             const result = await db.query(query, [book_id])
-            if (result.rows[0]) {
                 let BookGenre = []
                 result.rows.forEach(genre => {
                     BookGenre.push(genre.category_name)
                 });
-                
                 return BookGenre
-            } else {
-                throw new Error ("Không tìm thấy kết quả nào")
-            }
         } catch (err) {
             console.error('Error finding category by book name:', err);
             throw err;

@@ -3,6 +3,9 @@ import http from 'http';
 import { Server } from "socket.io";
 import passport from "../../Model/passport.js";
 
+import Socket from '../../Model/Socket/Socket.js';
+import User from "../../Model/Person/User.js";
+
 const app = express();
 
 // Tạo server HTTP bằng cách kết hợp với Express app
@@ -51,16 +54,44 @@ newsSocketNamespace.use((socket, next) => {
 newsSocketNamespace.on('connection', (socket) => {
   console.log("User connected:", socket.user.user_name);
 
-  socket.on('send_message', (data) => {
-    console.log(data);
-    
-    // Emit tin nhắn tới tất cả kết nối trong namespace
-    newsSocketNamespace.emit("receive_message", {
-      id: socket.id,
-      userImage: "https://fastly.picsum.photos/id/99/536/354.jpg?hmac=TAjl9K8MlAuXK5gnvATXTmOHkoN7bOjyqto5Qhxn1Cg",
-      userName: "Olivia White",
-      userComment: data.message,
-    });
+  // Xử lý sự kiện join_room
+  socket.on('join_room', async (roomID) => {
+    try {
+      socket.join(roomID); // Tham gia vào phòng cụ thể
+      console.log(`User ${socket.user.user_name} joined room ${roomID}`);
+
+      // Lấy dữ liệu chat trong phòng từ cơ sở dữ liệu
+      const result = await Socket.getChatInRoom(roomID, 1);
+
+      // Gửi dữ liệu chat về cho người dùng vừa tham gia phòng
+      socket.emit('room_data', result);  // Trả dữ liệu chat cho chính socket này
+    } catch (err) {
+      console.error('Error fetching chat data:', err);
+      socket.emit('error', { message: 'Không thể lấy dữ liệu chat cho phòng này' });
+    }
+  });
+
+  // Xử lý khi nhận tin nhắn từ client
+  socket.on('send_message', async ({ message, roomID }) => {
+    try {
+      // lưu và cơ sở dữ liệu 
+      const chat = await Socket.addNewChat(roomID, socket.user.user_id, message)
+      // Gửi tin nhắn tới tất cả các client trong cùng một phòng
+      newsSocketNamespace.emit("receive_message", {
+        socket_id: chat.socket_id,
+        room_id: chat.room_id,
+        user_id: chat.user_id,
+        user_name: socket.user.user_name,
+        avatar: socket.user.avatar,
+        content: chat.content,
+        timestamp: chat.timestamp
+      });
+
+      console.log(`Message from room ${roomID}: ${message}`);
+    } catch (err) {
+      console.error('Error save chat data:', err);
+      socket.emit('error', { message: 'không thể lưu trữ dữ liệu' });
+    }
   });
 
   // Xử lý khi socket ngắt kết nối
@@ -69,5 +100,4 @@ newsSocketNamespace.on('connection', (socket) => {
   });
 });
 
-// Export server và io để sử dụng ở các nơi khác
 export { server, app, io };

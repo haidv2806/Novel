@@ -10,11 +10,12 @@ import BookController from "./Service/Books/BookController.js";
 import VolumeController from "./Service/Books/VolumeController.js";
 import ChapterController from "./Service/Books/ChapterController.js";
 
-import { server, app, io } from "./Service/Chat/SocketController.js"
+import { server, app, io } from "./Service/Socket/SocketController.js"
 
 env.config();
 // const app = express();
 const port = 3000;
+
 
 app.use(
     session({
