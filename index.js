@@ -2,6 +2,7 @@ import express, { json, response} from "express";
 import session from "express-session";
 import env from "dotenv";
 import cors from "cors";
+import path from 'path';
 
 import InteractionController from "./Service/User/InteractionController.js";
 import Auth from "./Service/Auth/AuthController.js";
@@ -34,6 +35,7 @@ app.use(cors({origin: true, credentials: true}));
 // Middleware để xử lý dữ liệu dạng URL-encoded và JSON
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use('/image', express.static(path.join(process.env.PATH_SAVE_IMAGE)));
 
 app.use("/Auth", Auth);
 app.use("/User", UserController);

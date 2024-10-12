@@ -1,15 +1,23 @@
 import express, { json, response } from "express";
 import passport from "../../Model/passport.js";
 import User from "../../Model/Person/User.js";
+import upload from '../../Model/multer.js';
 
 const UserController = express.Router();
 
 //thay avartar
-UserController.post("/avatar", passport.authenticate('jwt', { session: false, optional: false }),
+UserController.post("/avatar", passport.authenticate('jwt', { session: false, optional: false }), upload.single('avatar'),
     async (req, res, cb) => {
+        let avatarUrl = null;
+
         try {
-            const picture = req.body.picture
-            const result = await User.updateNewAvatar(req.user.user_id, picture)
+            // Nếu người dùng đã upload file avatar, tạo URL cho ảnh
+            if (req.file) {
+                avatarUrl = `${req.protocol}://${req.get('host')}/image/${req.file.filename}`;
+            } else {
+                avatarUrl = process.env.Default_Image; // Ảnh mặc định nếu không upload
+            }
+            const result = await User.updateNewAvatar(req.user.user_id, avatarUrl)
 
             res.status(200).json({ result: true, message: 'New avatar uploaded successfully', user: result });
         } catch (err) {
@@ -22,7 +30,7 @@ UserController.post("/avatar", passport.authenticate('jwt', { session: false, op
 //Authorization: Bearer <AuthToken>
 // truyền dữ liệu vào body:
 // {
-//   "picture": base64
+//   "avatar": file jpeg|jpg|png
 // }
 
 
