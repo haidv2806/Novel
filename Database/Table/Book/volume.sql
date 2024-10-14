@@ -1,6 +1,6 @@
 CREATE TABLE volumes (
     volume_id SERIAL PRIMARY KEY,
-    volume_name VARCHAR (50) NOT NULL,
+    volume_name VARCHAR (500) NOT NULL,
     volume_number INT,
     book_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

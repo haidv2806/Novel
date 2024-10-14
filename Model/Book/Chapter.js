@@ -41,8 +41,8 @@ class Chapter {
             mammoth.extractRawText({ path: content })
                 .then(function (result) {
                     var text = result.value; // The raw text
-                    var textLength = text.length;
-                    const addTotalIndex = Book.addTotalIndex(BookID, textLength)
+                    var wordCount = text.trim().split(/\s+/).length;  // Đếm số từ
+                    const addTotalIndex = Book.addTotalIndex(BookID, wordCount);
                 })
             return result.rows[0]
         } catch (err) {

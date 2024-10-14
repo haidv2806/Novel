@@ -1,6 +1,6 @@
 CREATE TABLE chapters (
     chapter_id SERIAL PRIMARY KEY,
-    chapter_name VARCHAR(255) NOT NULL,
+    chapter_name VARCHAR(500) NOT NULL,
     chapter_number INT,
     content VARCHAR(255),  -- Hoặc BLOB tùy thuộc vào DBMS
     volume_id INT NOT NULL,

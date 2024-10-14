@@ -1,6 +1,6 @@
 CREATE TABLE books (
     book_id SERIAL PRIMARY KEY,
-    book_name VARCHAR (100) NOT NULL,
+    book_name VARCHAR (500) NOT NULL,
     book_image VARCHAR(255) NOT NULL,
     author_id INT NOT NULL,
     artist_id INT NOT NULL,
