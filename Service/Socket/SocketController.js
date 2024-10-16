@@ -86,8 +86,6 @@ newsSocketNamespace.on('connection', (socket) => {
         content: chat.content,
         timestamp: chat.timestamp
       });
-
-      console.log(`Message from room ${roomID}: ${message}`);
     } catch (err) {
       console.error('Error save chat data:', err);
       socket.emit('error', { message: 'không thể lưu trữ dữ liệu' });

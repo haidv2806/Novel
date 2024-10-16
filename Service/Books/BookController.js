@@ -36,8 +36,10 @@ BookController.post("/create", async (req, res, cb) => {
 //   "categories": array[String]
 // }
 
-BookController.get("/:bookId", async (req, res) => {
-    const bookid = req.params.bookId
+
+//tìm kiếm thông tin chi tiết của sách
+BookController.get("/", async (req, res) => {
+    const bookid = req.query.bookId  
     try {
         const book = new Book();
         await book.init(bookid);
@@ -49,10 +51,11 @@ BookController.get("/:bookId", async (req, res) => {
 })
 
 // sử dụng
-// gửi get vào: BaseURL/Book/<INT>
+// gửi get vào: BaseURL/Book?bookId=<INT>
 
-BookController.get("/View/:page", async (req, res) => {
-    const page = req.params.page || 1
+//lấy danh sách sách thông qua số lượng View
+BookController.get("/View", async (req, res) => {
+    const page = req.query.page || 1
     try {
         const book = await Book.findByView(page)
         res.status(200).json({ result: true, message: "tìm kiếm sách thông qua số lượng view thành công", Book: book })
@@ -62,7 +65,7 @@ BookController.get("/View/:page", async (req, res) => {
 })
 
 // sử dụng
-// gửi get vào: BaseURL/Book/View/<INT>
+// gửi get vào: BaseURL/Book/View?page=<INT>
 
 
 BookController.post("/search", async (req, res) => {

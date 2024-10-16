@@ -18,6 +18,7 @@ InteractionController.post("/interaction", passport.authenticate('jwt', { sessio
         }
     });
 
+
 // sử dụng
 // post vào baseURL/User/interaction
 //truyền dữ liệu và header:
@@ -28,5 +29,26 @@ InteractionController.post("/interaction", passport.authenticate('jwt', { sessio
 //     "book_id": string,
 //     "Value": string
 // }
+
+InteractionController.get("/isFollow", passport.authenticate('jwt', { session: false, optional: false }),
+    async (req, res, cb) => {
+        try {
+            const book_id = req.query.bookId
+            const result = await User.isUserFollowBook(book_id, req.user.user_id)
+            let isFollow = false
+
+            if(result != false){
+                isFollow = true
+            }
+
+            res.status(200).json({ result: true, message: "kiểm tra người dùng có tương tác với sách thành công", is_follow: isFollow });
+        } catch (err) {
+            return res.status(500).json({ result: false, message: "lỗi tương tác", error: err.message })
+        }
+});
+// sử dụng
+// get vào baseURL/User/isFollow?bookId=<INT>
+//truyền dữ liệu và header:
+//Authorization: Bearer <AuthToken>
 
 export default InteractionController

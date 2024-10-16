@@ -3,6 +3,7 @@ import mammoth from "mammoth";
 import fs from "fs"
 import Book from "./Book.js";
 import User from "../Person/User.js"
+import Volume from "./Volume.js";
 
 class Chapter {
     chapter_id
@@ -86,8 +87,10 @@ class Chapter {
 
     static async getContentById(id) {
         const query = `
-            SELECT book_id, content
+            SELECT chapters.book_id, book_name, volume_name, content
             FROM chapters
+                INNER JOIN books ON books.book_id = chapters.book_id
+                INNER JOIN volumes ON volumes.volume_id = chapters.volume_id
             WHERE chapter_id = $1
         `;
 
@@ -112,6 +115,8 @@ class Chapter {
 
             return {
                 book_id:result.rows[0].book_id,
+                book_name: result.rows[0].book_name,
+                volume_name: result.rows[0].volume_name,
                 content: paragraphs
             };
         } catch (err) {

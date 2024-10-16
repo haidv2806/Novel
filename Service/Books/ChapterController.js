@@ -30,8 +30,8 @@ ChapterController.post("/create", async (req, res, cb) => {
 //   "content": string (đường dẫn vào file word trong máy)
 // }
 
-ChapterController.get("/:chapterId", async (req, res) => {
-    const chapterId = req.params.chapterId;
+ChapterController.get("/", async (req, res) => {
+    const chapterId = req.query.chapterId;
     try {
       const result = await Chapter.findById(chapterId)
       res.status(200).json({ result: true, message: "tìm kiếm chapter bằng ID thành công", chapter: result});
@@ -41,7 +41,7 @@ ChapterController.get("/:chapterId", async (req, res) => {
   });
 
 // sử dụng
-//gửi get vào: BaseURL/Book/Volume/Chapter/<INT>
+//gửi get vào: BaseURL/Book/Volume/Chapter?chapterId=<INT>
 
 // ChapterController.get("/Content/:chapterId", async (req, res) => {
 //     const chapterId = req.params.chapterId;
@@ -53,9 +53,10 @@ ChapterController.get("/:chapterId", async (req, res) => {
 //         res.status(500).json({ result: false, message: "Đã xảy ra lỗi khi lấy content của chapter", error: err.message });
 //     }
 // })
-ChapterController.get("/Content/:chapterId", passport.authenticate('jwt', { session: false, optional: false }),
+
+ChapterController.get("/Content", passport.authenticate('jwt', { session: false, optional: false }),
 async (req, res, cb) => {
-    const chapterId = req.params.chapterId;
+    const chapterId = req.query.chapterId;
     try {
         const result = await Chapter.getContentById(chapterId)
         await User.updateUserInteraction(result.book_id, req.user.user_id, 'view', '')
@@ -64,6 +65,7 @@ async (req, res, cb) => {
         res.status(500).json({ result: false, message: "Đã xảy ra lỗi khi lấy content của chapter", error: err.message });
     }
 });
+//gửi get vào: BaseURL/Book/Volume/Chapter/Content?chapterId=<INT>
 
 
 

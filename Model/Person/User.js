@@ -140,14 +140,56 @@ class User {
             const type = ["follow", "rating" , "view"]
             if (!type.includes(interaction_type)) {
                 throw new Error(`type chỉ được một trong những loại sau: ${type.join(", ")}`)
-            } else if (interaction_type == "rating" & value > 5) {
-                throw new Error(`value của bạn là ${value}, và lớn hơn 5`)
+            } else if (interaction_type == "rating" && (!Number.isInteger(value) || value > 5 || value < 0)) {
+                throw new Error(`Giá trị của bạn là ${value}, chỉ được là số nguyên và trong khoảng từ 0 đến 5.`);
+            } else if (interaction_type == "follow") {
+                const result = await User.isUserFollowBook(book_id, user_id)
+                if (result) {
+                    await User.deleteInteraction(result.interaction_id)
+                    throw new Error("người dùng đã theo dõi, nên từ bỏ theo dõi")
+                }
             }
 
             const result = await db.query(query, [book_id, user_id, interaction_type, value])
             return result.rows[0]
         } catch (err) {
             console.error('Error handler interaction:', err);
+            throw err;
+        }
+    }
+
+    static async deleteInteraction(interaction_id){
+        const query = `
+            DELETE
+            FROM user_interactions
+            WHERE interaction_id = $1
+        `
+        try {
+            const result = await db.query(query, [interaction_id])
+        } catch (err) {
+            console.error('Error handler delete an interaction:', err);
+            throw err;
+        }
+    }
+
+    static async isUserFollowBook(book_id, user_id){
+        const query = `
+            SELECT *
+            FROM user_interactions
+            WHERE book_id = $1
+            AND user_id = $2
+            AND interaction_type = 'follow'
+        `
+        try {
+            const result = await db.query(query, [book_id, user_id])
+
+            if (result.rows[0]) {
+                return result.rows[0]
+            } else {
+                return false
+            }
+        } catch (err) {
+            console.error(`Error handler finding is the user ${user_id} follow this book ${book_id}: `, err);
             throw err;
         }
     }
