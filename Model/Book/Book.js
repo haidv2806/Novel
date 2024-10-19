@@ -21,7 +21,7 @@ class Book {
     average_rating
     rating_count
     views
-    folow
+    follow
     latest_update
 
     constructor() {
@@ -51,10 +51,10 @@ class Book {
             this.description = book.description
             this.total_index = book.total_index
             
-            this.average_rating = rating.average_rating
-            this.rating_count = rating.rating_count
+            this.average_rating = rating.average_rating.toFixed(2)
+            this.rating_count = rating.total_rating
             this.views = total_views
-            this.folow = total_follows
+            this.follow = total_follows
             this.latest_update = last_update
 
             // Lấy tất cả volumes và khởi tạo chúng bất đồng bộ

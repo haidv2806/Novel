@@ -146,7 +146,7 @@ class User {
                 const result = await User.isUserFollowBook(book_id, user_id)
                 if (result) {
                     await User.deleteInteraction(result.interaction_id)
-                    throw new Error("người dùng đã theo dõi, nên từ bỏ theo dõi")
+                    return {message: "người dùng đã theo dõi, nên từ bỏ theo dõi"}
                 }
             }
 
@@ -190,6 +190,27 @@ class User {
             }
         } catch (err) {
             console.error(`Error handler finding is the user ${user_id} follow this book ${book_id}: `, err);
+            throw err;
+        }
+    }
+
+    static async isUserRatedBook(book_id, user_id){
+        const query = `
+            SELECT *
+            FROM user_interactions
+            WHERE book_id = $1
+            AND user_id = $2
+            AND interaction_type = 'rating'
+        `
+        try {
+            const result = await db.query(query, [book_id, user_id])
+            if (result.rows[0]) {
+                return result.rows[0]
+            } else {
+                return false
+            }
+        } catch (err) {
+            console.error(`Error handler finding is the user ${user_id} rating this book ${book_id}: `, err);
             throw err;
         }
     }
