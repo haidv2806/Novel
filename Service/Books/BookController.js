@@ -43,7 +43,6 @@ BookController.get("/", async (req, res) => {
     try {
         const book = new Book();
         await book.init(bookid);
-
         res.status(200).json({ result: true, message: "tìm kiếm sách thông quaID thành công", Book: book })
     } catch (err) {
         return res.status(500).json({ result: false, message: "Đã xảy ra lỗi tìm sách bằng ID", error: err.message });
@@ -70,7 +69,7 @@ BookController.get("/View", async (req, res) => {
 
 BookController.post("/search", async (req, res) => {
     const search = req.body.search
-    const page = parseInt(req.params.page) || 1;  // Kiểm tra và đặt giá trị mặc định cho page
+    const page = req.query.page || 1;  // Kiểm tra và đặt giá trị mặc định cho page
     try {
         const result = await Book.findBySearchName(search, page)
         res.status(200).json({ result: true, message: "tìm kiếm sách thông qua tên thành công", Book: result })

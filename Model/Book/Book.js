@@ -51,13 +51,12 @@ class Book {
             this.description = book.description
             this.total_index = book.total_index
             
-            this.average_rating = rating.average_rating.toFixed(2)
-            this.rating_count = rating.total_rating
+            this.average_rating = rating.average_rating?.toFixed(2) || 0
+            this.rating_count = rating.total_rating || 0
             this.views = total_views
             this.follow = total_follows
             this.latest_update = last_update
 
-            // Lấy tất cả volumes và khởi tạo chúng bất đồng bộ
             const allVolumes = await Volume.findByBookId(BookID);
             for (const volumeData of allVolumes) {
                 const volume = new Volume(); // Tạo volume
