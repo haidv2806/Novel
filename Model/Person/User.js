@@ -215,18 +215,18 @@ class User {
         }
     }
 
-    static async checkBookMark(id, page) {
+    static async checkFollowedBooks(id, page) {
         const query = `
             SELECT book_id
             From user_interactions
             WHERE user_id = $1
-            AND interaction_type = 'bookMark'
+            AND interaction_type = 'follow'
             LIMIT 10 OFFSET $2;
         `
         try {
             const books = await db.query(query, [id, (page * 10) - 10])
             if (!books.rows) {
-                throw new Error("Người dùng đang không để bookMark nào")
+                throw new Error("Người dùng đang không follow truyện nào")
             }
 
             const result = []
