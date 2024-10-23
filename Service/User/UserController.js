@@ -65,7 +65,7 @@ UserController.get("/followedBook", passport.authenticate('jwt', { session: fals
             const page = req.query.page || 1   
             const result = await User.checkFollowedBooks(req.user.user_id, page)
 
-            res.status(200).json({ result: true, message: 'tìm sách đã follow thành công', user: req.user, books: result });
+            res.status(200).json({ result: true, message: 'tìm sách đã follow thành công', Books: result });
         } catch (err) {
             return res.status(500).json({ result: false, message: "Không tìm được sách đã follow của người dùng", error: err.message })
         }
