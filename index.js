@@ -47,5 +47,5 @@ app.use("/Book/Volume/Chapter", ChapterController);
 
 // Khởi động server HTTP để lắng nghe trên cổng 3000
 server.listen(port, () => {
-  console.log(`Server running on https://localhost:${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });

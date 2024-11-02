@@ -1,11 +1,11 @@
 import express from "express";
 import https from 'https';
+import http from 'http';
 import { Server } from "socket.io";
 import passport from "../../Model/passport.js";
 import fs from "fs"
 
 import Socket from '../../Model/Socket/Socket.js';
-import User from "../../Model/Person/User.js";
 
 const app = express();
 
@@ -15,7 +15,8 @@ const httpsOptions = {
 }
 
 // Tạo server HTTP bằng cách kết hợp với Express app
-const server = https.createServer( httpsOptions, app);
+// const server = https.createServer( httpsOptions, app);
+const server = http.createServer(app);
 
 // Cấu hình socket.io với server HTTP
 const io = new Server(server, {

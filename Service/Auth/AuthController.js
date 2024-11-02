@@ -48,7 +48,7 @@ Auth.post("/sign_up", async (req, res, cb) => {
                     return res.status(500).json({ result: false, message: "Lỗi khi mã hóa mật khẩu.", error: err });
                 } else {
                     const result = await User.create(email, hash, name)
-                    return res.status(201).json({ result: true, message: "Đăng ký thành công!", result })
+                    return res.status(201).json({ result: true, message: "Đăng ký thành công!", user: result })
                 }
             });
         }
