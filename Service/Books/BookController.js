@@ -69,7 +69,7 @@ BookController.get("/View", async (req, res) => {
 
 BookController.post("/search", async (req, res) => {
     const search = req.body.search
-    const page = req.query.page || 1;  // Kiểm tra và đặt giá trị mặc định cho page
+    const page = req.query.page || 1;
     try {
         const result = await Book.findBySearchName(search, page)
         res.status(200).json({ result: true, message: "tìm kiếm sách thông qua tên thành công", Book: result })
