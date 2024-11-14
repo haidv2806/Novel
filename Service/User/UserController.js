@@ -13,12 +13,8 @@ UserController.post("/avatar", passport.authenticate('jwt', { session: false, op
         try {
             // Nếu người dùng đã upload file avatar, tạo URL cho ảnh
             if (!req.file) {
-                console.log("khong co file");
-                
                 return res.status(500).json({ result: false, message: "bạn đang không đính kèm bất kỳ tệp tin nào"})
             } else {
-                console.log("co file");
-                
                 avatarUrl = `${req.protocol}://${req.get('host')}/image/${req.file.filename}`;
             }
             const result = await User.updateNewAvatar(req.user.user_id, avatarUrl)
