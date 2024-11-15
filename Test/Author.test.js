@@ -3,7 +3,7 @@ import sinon from "sinon";  // Thư viện giả lập
 import Author from "../Model/Person/Author.js";
 import db from "../Service/database.js";  // Đảm bảo import db
 
-const newAuthorName = "anhhai";
+const newAuthorName = "Hai";
 const id = 1
 
 describe("Author class testing", () => {
@@ -34,7 +34,7 @@ describe("Author class testing", () => {
     expect(result.author_id).to.not.be.undefined;
     expect(result.author_name).to.equal(newAuthorName);
     expect(typeof result.author_id).to.equal("number");
-
+   
     // Kiểm tra xem db.query đã được gọi đúng cách
     expect(queryStub.calledOnce).to.be.true;
     expect(queryStub.firstCall.args[0]).to.include("INSERT INTO authors");

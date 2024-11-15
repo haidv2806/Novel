@@ -2,8 +2,6 @@ import db from "../../Service/database.js";
 import mammoth from "mammoth";
 import fs from "fs"
 import Book from "./Book.js";
-import User from "../Person/User.js"
-import Volume from "./Volume.js";
 
 class Chapter {
     chapter_id
