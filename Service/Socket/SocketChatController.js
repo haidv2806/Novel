@@ -85,7 +85,7 @@ newsSocketNamespace.on('connection', (socket) => {
         console.log(`User ${socket.user.user_name} joined room ${roomID}`);
 
         // Lấy dữ liệu chat trong phòng từ cơ sở dữ liệu
-        const result = await Socket.getChatInRoom(roomID, 1);
+        const result = await Socket.getChatInRoom(roomID, 1, socket.user.user_id);
         
         // Gửi dữ liệu chat về cho người dùng vừa tham gia phòng
         socket.emit('room_data', {MainChat: result});  // Trả dữ liệu chat cho chính socket này
@@ -113,6 +113,8 @@ newsSocketNamespace.on('connection', (socket) => {
           user_name: socket.user.user_name,
           avatar: socket.user.avatar,
           content: chat.content,
+          total_like: 0,
+          is_like: false,
           timestamp: chat.timestamp
         });
       } catch (err) {

@@ -45,12 +45,14 @@ class Socket {
         const number = parseInt(socket_id.replace(/\D/g, ''), 10);
         try {
             const result = await db.query(query, [number])
-            const likeData = await this.countAllLikeInChat(number);
+            const likeData = await Socket.countAllLikeInChat(number);
+            const isLike = await Socket.checkLike(number);
 
             const chatData = result.rows[0];
             return {
                 ...chatData,
                 total_like: likeData.total_like,
+                is_like: isLike
             };
         } catch (err) {
             console.error('Error take a chat by socket id:', err);
@@ -114,7 +116,7 @@ class Socket {
         }
     }
 
-    static async getChatInRoom(room_id, page) {
+    static async getChatInRoom(room_id, page, userID) {
         const query = `
             SELECT socket_id, room_id, socket.user_id, user_name, avatar, content, timestamp
             FROM socket
@@ -131,10 +133,12 @@ class Socket {
                 result.rows.map(async (data) => {
                     const replyCount = await Socket.countAllReplyInAChat(`Reply ${data.socket_id}`);
                     const likeCount = await Socket.countAllLikeInChat(data.socket_id)
+                    const isLike = await Socket.checkLike(data.socket_id, userID)
                     return {
                         ...data,
                         total_reply: replyCount.total_reply,
                         total_like: likeCount.total_like,
+                        is_like: isLike,
                     };
                 })
             );

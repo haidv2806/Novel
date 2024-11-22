@@ -32,8 +32,9 @@ SocketController.get("/room", passport.authenticate('jwt', { session: false, opt
         try {
             const roomID = req.query.roomID
             const page = req.query.page || 1
+            const userID = req.user.user_id
 
-            const result = await Socket.getChatInRoom(roomID, page)
+            const result = await Socket.getChatInRoom(roomID, page, userID)
 
             res.status(200).json({ result: true, message: `lấy dữ liệu từ roomID thành công`, user: result });
         } catch (err) {
