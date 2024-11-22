@@ -2,33 +2,19 @@ import db from '../../Service/database.js'
 
 class Socket {
     MainChat
-    // socket_id
-    // room_id
-    // user_id
-    // avatar
-    // content
-    // timestamp
     Reply
 
-    constructor (){
-        this.Reply =[]
+    constructor() {
+        this.Reply = []
     }
 
     // lấy dữ liệu cho 1 group chat của reply
-    async init(socket_id){
+    async init(socket_id) {
         const mainChat = await Socket.getChat(socket_id)
         const reply = await Socket.getChatInRoom(socket_id, 1)
-        console.log(reply);
-        
 
         if (mainChat) {
             this.MainChat = mainChat
-            // this.socket_id = mainChat.socket_id
-            // this.room_id = mainChat.room_id
-            // this.user_id = mainChat.user_id
-            // this.avatar = mainChat.avatar
-            // this.content = mainChat.content
-            // this.timestamp = mainChat.timestamp
             this.Reply = reply
         }
     }
@@ -48,7 +34,7 @@ class Socket {
         }
     }
 
-    static async getChat(socket_id){
+    static async getChat(socket_id) {
         const query = `
             SELECT socket_id, room_id, socket.user_id, user_name, avatar, content, timestamp
             FROM socket
@@ -59,61 +45,76 @@ class Socket {
         const number = parseInt(socket_id.replace(/\D/g, ''), 10);
         try {
             const result = await db.query(query, [number])
-            return result.rows[0]
+            const likeData = await this.countAllLikeInChat(number);
+
+            const chatData = result.rows[0];
+            return {
+                ...chatData,
+                total_like: likeData.total_like,
+            };
         } catch (err) {
             console.error('Error take a chat by socket id:', err);
             throw err;
         }
     }
 
-    static async addNewReply(socket_id, user_id, content) {
+    static async addLike(socket_id, user_id) {
         const query = `
-            INSERT INTO socket_replies (socket_id, user_id, content)
-            VALUES ($1, $2, $3)
+            INSERT INTO socket_likes (socket_id, user_id)
+            VALUES ($1, $2)
             RETURNING *
         `
         try {
-            const result = await db.query(query, [socket_id, user_id, content])
+            const isLike = await Socket.checkLike(socket_id, user_id)
+            if (isLike) {
+                const result = await Socket.deleteLike(socket_id, user_id)
+                return `Đã xoá like cho user ${user_id}`
+            } else {
+            const result = await db.query(query, [socket_id, user_id])
             return result.rows[0]
-        } catch (err) {
-            console.error('Error adding new reply in to database:', err);
-            throw err;
-        }
-    }
-    
-    static async getAllReplyFromSocketId(socket_id, page){
-        const query = `
-            SELECT *
-            FROM socket_replies
-            WHERE socket_id = $1
-            ORDER BY timestamp DESC
-            LIMIT 10 OFFSET $2
-        `
-        try {
-            const result = await db.query(query, [socket_id, (page * 10) - 10])
-            return result.rows
-        } catch (error) {
-            console.error(`Error get all chat in socket_id ${socket_id} room:`, err);
-            throw err;
-        }
-    }
-
-    static async addLike(socket_id, replies_id, user_id) {
-        const query = `
-            INSERT INTO socket_likes (socket_id, replies_id, user_id)
-            VALUES ($1, $2, $3)
-            RETURNING *
-        `
-        try {
-            const result = await db.query(query, [socket_id, replies_id, user_id])
-            return result.rows[0]
+            }
         } catch (err) {
             console.error('Error adding new like to a commment:', err);
             throw err;
         }
     }
 
-    static async getChatInRoom(room_id, page){
+    static async deleteLike (socket_id, user_id){
+        const query = `
+            DELETE FROM socket_likes
+            WHERE socket_id = $1
+            AND user_id = $2
+        `
+        try {
+            const result = await db.query(query, [socket_id, user_id])
+            return result.rows[0]
+        } catch (err) {
+            console.error('Error delete like to a commment:', err);
+            throw err;
+        }
+    }
+
+    static async checkLike(socket_id, user_id){
+        const query = `
+            SELECT *
+            FROM socket_likes
+            WHERE socket_id = $1
+            AND user_id = $2
+        `
+        try {
+            const result = await db.query(query, [socket_id, user_id])
+            if (result.rows[0]) {
+                return true
+            } else {
+                return false
+            }
+        } catch (err) {
+            console.error('Error checking like to a commment:', err);
+            throw err;
+        }
+    }
+
+    static async getChatInRoom(room_id, page) {
         const query = `
             SELECT socket_id, room_id, socket.user_id, user_name, avatar, content, timestamp
             FROM socket
@@ -124,11 +125,53 @@ class Socket {
         `
         try {
             const result = await db.query(query, [room_id, (page * 10) - 10])
-            console.log(room_id);
-            
-            return result.rows
+
+            // Sử dụng Promise.all để đợi tất cả các hàm countAllReplyInAChat hoàn tất
+            const data = await Promise.all(
+                result.rows.map(async (data) => {
+                    const replyCount = await Socket.countAllReplyInAChat(`Reply ${data.socket_id}`);
+                    const likeCount = await Socket.countAllLikeInChat(data.socket_id)
+                    return {
+                        ...data,
+                        total_reply: replyCount.total_reply,
+                        total_like: likeCount.total_like,
+                    };
+                })
+            );
+
+            return data;
         } catch (err) {
             console.error(`Error get chat in room ${room_id} :`, err);
+            throw err;
+        }
+    }
+
+    static async countAllReplyInAChat(room_id) {
+        const query = `
+            SELECT COUNT(*) AS total_reply
+            FROM socket
+            WHERE room_id = $1
+        `
+        try {
+            const result = await db.query(query, [room_id])
+            return result.rows[0]
+        } catch (err) {
+            console.error(`Error get total reply in room ${room_id} :`, err);
+            throw err;
+        }
+    }
+
+    static async countAllLikeInChat(socket_id){
+        const query = `
+            SELECT COUNT (*) AS total_like
+            FROM socket_likes
+            WHERE socket_id = $1
+        `
+        try {
+            const result = await db.query(query, [socket_id])
+            return result.rows[0]
+        } catch (err) {
+            console.error(`Error get total like for SocketID: ${socket_id} :`, err);
             throw err;
         }
     }

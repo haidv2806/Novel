@@ -10,8 +10,9 @@ import UserController from "./Service/User/UserController.js";
 import BookController from "./Service/Books/BookController.js";
 import VolumeController from "./Service/Books/VolumeController.js";
 import ChapterController from "./Service/Books/ChapterController.js";
+import SocketController from "./Service/Socket/SocketController.js";
 
-import { server, app, io } from "./Service/Socket/SocketController.js"
+import { server, app, io } from "./Service/Socket/SocketChatController.js"
 
 env.config();
 // const app = express();
@@ -40,6 +41,7 @@ app.use('/image', express.static(path.join(process.env.PATH_SAVE_IMAGE)));
 app.use("/Auth", Auth);
 app.use("/User", UserController);
 app.use("/User", InteractionController);
+app.use("/Socket", SocketController);
 app.use("/Book", BookController);
 app.use("/Book/Volume", VolumeController);
 app.use("/Book/Volume/Chapter", ChapterController);
