@@ -70,7 +70,7 @@ newsSocketNamespace.on('connection', (socket) => {
 
         // Lấy dữ liệu chat trong phòng từ cơ sở dữ liệu
         const socketdata = new Socket()
-        await socketdata.init(roomID)
+        await socketdata.init(roomID, socket.user.user_id)
 
         // Gửi dữ liệu chat về cho người dùng vừa tham gia phòng
         socket.emit('room_data', socketdata);  // Trả dữ liệu chat cho chính socket này

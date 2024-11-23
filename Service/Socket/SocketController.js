@@ -7,12 +7,12 @@ const SocketController = express.Router()
 SocketController.post("/like", passport.authenticate('jwt', { session: false, optional: false }),
     async (req, res, cb) => {
         try {
-            const socketID = req.body.socketID
+            const socketID = req.body.socketID     
             const userID = req.user.user_id
 
             const result = await Socket.addLike(socketID, userID)
 
-            res.status(200).json({ result: true, message: `đã thêm cập nhật like cho SocketID ${socketID}`, user: result });
+            res.status(200).json({ result: true, message: `đã thêm cập nhật like cho SocketID ${socketID}`, Comment: result });
         } catch (err) {
             return res.status(500).json({ result: false, message: "lỗi không cập nhật được like", error: err.message })
         }
@@ -36,7 +36,7 @@ SocketController.get("/room", passport.authenticate('jwt', { session: false, opt
 
             const result = await Socket.getChatInRoom(roomID, page, userID)
 
-            res.status(200).json({ result: true, message: `lấy dữ liệu từ roomID thành công`, user: result });
+            res.status(200).json({ result: true, message: `lấy dữ liệu từ roomID thành công`, Comment: result });
         } catch (err) {
             return res.status(500).json({ result: false, message: "lỗi không lấy được dữ liệu từ roomID", error: err.message })
         }

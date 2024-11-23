@@ -9,9 +9,9 @@ class Socket {
     }
 
     // lấy dữ liệu cho 1 group chat của reply
-    async init(socket_id) {
-        const mainChat = await Socket.getChat(socket_id)
-        const reply = await Socket.getChatInRoom(socket_id, 1)
+    async init(socket_id, user_id) {
+        const mainChat = await Socket.getChat(socket_id, user_id)
+        const reply = await Socket.getChatInRoom(socket_id, 1, user_id)
 
         if (mainChat) {
             this.MainChat = mainChat
@@ -34,7 +34,7 @@ class Socket {
         }
     }
 
-    static async getChat(socket_id) {
+    static async getChat(socket_id, user_id) {
         const query = `
             SELECT socket_id, room_id, socket.user_id, user_name, avatar, content, timestamp
             FROM socket
@@ -46,7 +46,7 @@ class Socket {
         try {
             const result = await db.query(query, [number])
             const likeData = await Socket.countAllLikeInChat(number);
-            const isLike = await Socket.checkLike(number);
+            const isLike = await Socket.checkLike(number, user_id);
 
             const chatData = result.rows[0];
             return {
