@@ -43,7 +43,7 @@ BookController.get("/", async (req, res) => {
     try {
         const book = new Book();
         await book.init(bookid);
-        res.status(200).json({ result: true, message: "tìm kiếm sách thông quaID thành công", Book: book })
+        res.status(200).json({ result: true, message: "tìm kiếm sách thông qua ID thành công", Book: book })
     } catch (err) {
         return res.status(500).json({ result: false, message: "Đã xảy ra lỗi tìm sách bằng ID", error: err.message });
     }
@@ -51,6 +51,30 @@ BookController.get("/", async (req, res) => {
 
 // sử dụng
 // gửi get vào: BaseURL/Book?bookId=<INT>
+
+BookController.get("/Genre", async (req, res) => {
+    const genre = req.query.genre
+    const page = req.query.page || 1
+    
+    try {
+        const result = await Book.findByGenre(genre, page)
+        res.status(200).json({ result: true, message: `tìm kiếm sách thông qua thể loại: ${genre} thành công`, Book: result })
+    } catch (err) {
+        return res.status(500).json({ result: false, message: `Đã xảy ra lỗi lấy danh sách truyện thuộc thể loại: ${genre}`, error: err.message });
+    }
+})
+
+BookController.post("/Genre", async (req, res) => {
+    const genre = req.body.genre
+    const page = req.query.page || 1
+    
+    try {
+        const result = await Book.findByMultiGene(genre, page)
+        res.status(200).json({ result: true, message: `tìm kiếm sách thông qua thể loại: ${genre} thành công`, Book: result })
+    } catch (err) {
+        return res.status(500).json({ result: false, message: `Đã xảy ra lỗi lấy danh sách truyện thuộc thể loại: ${genre}`, error: err.message });
+    }
+})
 
 //lấy danh sách sách thông qua số lượng View
 BookController.get("/View", async (req, res) => {

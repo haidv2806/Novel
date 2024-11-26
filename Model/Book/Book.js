@@ -50,7 +50,7 @@ class Book {
             this.status = book.status
             this.description = book.description
             this.total_index = book.total_index
-            
+
             this.average_rating = rating.average_rating?.toFixed(2) || 0
             this.rating_count = rating.total_rating || 0
             this.views = total_views
@@ -208,17 +208,42 @@ class Book {
             FROM books 
                 INNER JOIN authors ON books.author_id = authors.author_id
                 INNER JOIN books_categories ON books.book_id = books_categories.book_id
-                INNER JOIN categories ON books.category_id = categories.category_id
+                INNER JOIN categories ON books_categories.category_id = categories.category_id
             WHERE category_name = $1
             LIMIT 10 OFFSET $2
         `
         try {
             const result = await db.query(query, [genre, (page * 10) - 10])
-            return result.rows
+            return result.rows[0]
         } catch (err) {
             console.error('Error finding book by genre:', err);
             throw err;
         }
+    }
+
+    static async findByMultiGene(genres, page) {
+            const placeholders = genres.map((_, index) => `$${index + 1}`).join(', ');
+            const query = `
+                SELECT books.book_id, book_name, book_image, author_name
+                FROM books
+                    INNER JOIN authors ON books.author_id = authors.author_id
+                    INNER JOIN books_categories ON books.book_id = books_categories.book_id
+                    INNER JOIN categories ON books_categories.category_id = categories.category_id
+                WHERE category_name IN (${placeholders})
+                GROUP BY books.book_id, book_name, book_image, author_name
+                HAVING COUNT(DISTINCT category_name) = $${genres.length + 1}
+                LIMIT 10 OFFSET $${genres.length + 2}
+            `;
+        
+            const values = [...genres, genres.length, (page * 10) - 10];
+        
+            try {
+                const result = await db.query(query, values);
+                return result.rows;
+            } catch (err) {
+                console.error('Error finding books by all genres:', err);
+                throw err;
+            }
     }
 
     static async findByIdForSearch(id) {
@@ -356,7 +381,7 @@ class Book {
         }
     }
 
-    static async countFollow(id){
+    static async countFollow(id) {
         const query = `
             SELECT COUNT(*) AS total_follows
             FROM user_interactions
