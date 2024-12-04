@@ -15,7 +15,7 @@ ChapterController.post("/create", async (req, res, cb) => {
     const Content = req.body.content
     try {
         const result = await Book.createChapter(BookName, VolumeName, ChapterName, Content)
-        res.status(200).json( {result: true, message: `tạo Chapter mới cho volume ${VolumeName} của truyện ${BookName} thành công`, Chapter: result})
+        res.status(201).json( {result: true, message: `tạo Chapter mới cho volume ${VolumeName} của truyện ${BookName} thành công`, Chapter: result})
     } catch (err) {   
         return res.status(500).json({ result: false, message: "Đã xảy ra lỗi khi tạo chapter mới", error: err.message });
     }

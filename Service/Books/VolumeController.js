@@ -9,7 +9,7 @@ VolumeController.post("/create", async (req, res, cb) => {
 
     try {
         const result = await Book.createVolume(BookName, VolumeName)
-        res.status(200).json( {result: true, message: `tạo volume mới cho ${BookName} thành công`, Volume: result})
+        res.status(201).json( {result: true, message: `tạo volume mới cho ${BookName} thành công`, Volume: result})
     } catch (err) {   
         return res.status(500).json({ result: false, message: "Đã xảy ra lỗi khi tạo volume mới", error: err.message });
     }

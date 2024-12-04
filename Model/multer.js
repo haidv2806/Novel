@@ -23,7 +23,7 @@ const fileFilter = (req, file, cb) => {
     if (extName && mimeType) {
         return cb(null, true);
     } else {
-        cb(new Error('Only images are allowed'));
+        return cb(new Error('Only images jpeg|jpg|png are allowed'), false);
     }
 };
 

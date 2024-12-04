@@ -10,6 +10,12 @@ InteractionController.post("/interaction", passport.authenticate('jwt', { sessio
             const type = req.body.type
             const book_id = req.body.book_id
             const value = req.body.value ? req.body.value : "";
+
+            if(!type){
+                res.status(400).json({ result: false, message: `yêu cầu phải có trạng thái tương tác`});
+            } else if (!book_id) {
+                res.status(400).json({ result: false, message: `yêu cầu phải có id của sách được tương tác`});
+            }
             const result = await User.updateUserInteraction(book_id, req.user.user_id, type, value)
 
             res.status(200).json({ result: true, message: `trạng thái tương tác ${type} được cập nhật`, user: result });

@@ -18,7 +18,7 @@ BookController.post("/create", async (req, res, cb) => {
         categories.forEach(async (category) => {
             await Category.addCategories(addBook.book_id, category)
         });
-        res.status(200).json({ result: true, message: "tạo bộ sách mới thành công", book: addBook })
+        res.status(201).json({ result: true, message: "tạo bộ sách mới thành công", book: addBook })
     } catch (err) {
         return res.status(500).json({ result: false, message: "Đã xảy ra lỗi khi tạo sách mới", error: err.message });
     }

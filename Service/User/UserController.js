@@ -13,7 +13,7 @@ UserController.post("/avatar", passport.authenticate('jwt', { session: false, op
         try {
             // Nếu người dùng đã upload file avatar, tạo URL cho ảnh
             if (!req.file) {
-                return res.status(500).json({ result: false, message: "bạn đang không đính kèm bất kỳ tệp tin nào"})
+                return res.status(500).json({ result: false, message: "bạn đang không đính kèm bất kỳ tệp tin nào" })
             } else {
                 avatarUrl = `${req.protocol}://${req.get('host')}/image/${req.file.filename}`;
             }
@@ -21,6 +21,10 @@ UserController.post("/avatar", passport.authenticate('jwt', { session: false, op
 
             res.status(200).json({ result: true, message: 'thay đổi avatar thành công', user: result });
         } catch (err) {
+            // Xử lý lỗi khi không phải ảnh
+            if (err.message === 'Only images are allowed') {
+                return res.status(400).json({ result: false, message: "Sai định dạng file. Vui lòng tải lên tệp ảnh." });
+            }
             return res.status(500).json({ result: false, message: "Không thay đổi avatar", error: err.message })
         }
     });
@@ -39,6 +43,9 @@ UserController.post("/name", passport.authenticate('jwt', { session: false, opti
     async (req, res, cb) => {
         try {
             const name = req.body.name
+            if (!name){
+                res.status(400).json({ result: false, message: 'Không tồn tại trường name'});
+            }
             const result = await User.updateNewName(req.user.user_id, name)
 
             res.status(200).json({ result: true, message: 'New name uploaded successfully', user: result });
@@ -58,14 +65,14 @@ UserController.post("/name", passport.authenticate('jwt', { session: false, opti
 UserController.get("/followedBook", passport.authenticate('jwt', { session: false, optional: false }),
     async (req, res, cb) => {
         try {
-            const page = req.query.page || 1   
+            const page = req.query.page || 1
             const result = await User.checkFollowedBooks(req.user.user_id, page)
 
             res.status(200).json({ result: true, message: 'tìm sách đã follow thành công', Books: result });
         } catch (err) {
             return res.status(500).json({ result: false, message: "Không tìm được sách đã follow của người dùng", error: err.message })
         }
-});
+    });
 
 
 
