@@ -13,7 +13,7 @@ UserController.post("/avatar", passport.authenticate('jwt', { session: false, op
         try {
             // Nếu người dùng đã upload file avatar, tạo URL cho ảnh
             if (!req.file) {
-                return res.status(500).json({ result: false, message: "bạn đang không đính kèm bất kỳ tệp tin nào" })
+                return res.status(400).json({ result: false, message: "bạn đang không đính kèm bất kỳ tệp tin nào" })
             } else {
                 avatarUrl = `${req.protocol}://${req.get('host')}/image/${req.file.filename}`;
             }
@@ -44,8 +44,9 @@ UserController.post("/name", passport.authenticate('jwt', { session: false, opti
         try {
             const name = req.body.name
             if (!name){
-                res.status(400).json({ result: false, message: 'Không tồn tại trường name'});
+                return res.status(400).json({ result: false, message: 'Không tồn tại trường name'});
             }
+
             const result = await User.updateNewName(req.user.user_id, name)
 
             res.status(200).json({ result: true, message: 'New name uploaded successfully', user: result });

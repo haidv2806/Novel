@@ -8,6 +8,10 @@ VolumeController.post("/create", async (req, res, cb) => {
     const VolumeName = req.body.volume_name
 
     try {
+        if (!BookName || !VolumeName) {
+            return res.status(201).json( {result: false, message: `yêu cầu phải có trường BookName và VolumeName`})
+        }
+
         const result = await Book.createVolume(BookName, VolumeName)
         res.status(201).json( {result: true, message: `tạo volume mới cho ${BookName} thành công`, Volume: result})
     } catch (err) {   

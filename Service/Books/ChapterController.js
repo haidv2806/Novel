@@ -14,6 +14,10 @@ ChapterController.post("/create", async (req, res, cb) => {
     const ChapterName = req.body.chapter_name
     const Content = req.body.content
     try {
+        if (!BookName || !VolumeName || !ChapterName || !Content) {
+            return res.status(400).json( {result: false, message: `yêu cầu phải có trường book_name, volume_name, chapter_name, content`})
+        }
+        
         const result = await Book.createChapter(BookName, VolumeName, ChapterName, Content)
         res.status(201).json( {result: true, message: `tạo Chapter mới cho volume ${VolumeName} của truyện ${BookName} thành công`, Chapter: result})
     } catch (err) {   
@@ -33,6 +37,10 @@ ChapterController.post("/create", async (req, res, cb) => {
 ChapterController.get("/", async (req, res) => {
     const chapterId = req.query.chapterId;
     try {
+        if (!chapterId) {
+            return res.status(400).json( {result: false, message: `yêu cầu phải có trường chapterId`})
+        }
+
       const result = await Chapter.findById(chapterId)
       res.status(200).json({ result: true, message: "tìm kiếm chapter bằng ID thành công", chapter: result});
     } catch (err) {
@@ -58,6 +66,10 @@ ChapterController.get("/Content", passport.authenticate('jwt', { session: false,
 async (req, res, cb) => {
     const chapterId = req.query.chapterId;
     try {
+        if (!chapterId) {
+            return res.status(400).json( {result: false, message: `yêu cầu phải có trường chapterId`})
+        }
+
         const result = await Chapter.getContentById(chapterId)
         await User.updateUserInteraction(result.book_id, req.user.user_id, 'view', '')
         res.status(200).json({ result: true, message: "tìm kiếm content bằng ID thành công", chapter: result});

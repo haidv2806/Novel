@@ -33,11 +33,19 @@ app.use(
 // Cấu hình CORS để hỗ trợ Socket.io
 app.use(cors({origin: true, credentials: true}));
 
+//đảm bảo sever không crash
+app.use((err, req, res, next) => {
+  console.error('Global Error:', err.stack);
+  res.status(500).send('Something went wrong!');
+});
+
+
 // Middleware để xử lý dữ liệu dạng URL-encoded và JSON
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use('/image', express.static(path.join(process.env.PATH_SAVE_IMAGE)));
 
+
+app.use('/image', express.static(path.join(process.env.PATH_SAVE_IMAGE)));
 app.use("/Auth", Auth);
 app.use("/User", UserController);
 app.use("/User", InteractionController);
@@ -45,6 +53,14 @@ app.use("/Socket", SocketController);
 app.use("/Book", BookController);
 app.use("/Book/Volume", VolumeController);
 app.use("/Book/Volume/Chapter", ChapterController);
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
 
 
 // Khởi động server HTTP để lắng nghe trên cổng 3000

@@ -14,6 +14,10 @@ BookController.post("/create", async (req, res, cb) => {
     const decription = req.body.decription
     const categories = req.body.categories
     try {
+        if(!name || !image || !author || !artist || !status || !decription || categories){
+            return res.status(400).json({ result: false, message: "yêu cầu phải có trường name, image, author, artist, status, decription, categories"})
+        }
+        
         const addBook = await Book.create(name, image, author, artist, status, decription)
         categories.forEach(async (category) => {
             await Category.addCategories(addBook.book_id, category)
@@ -41,6 +45,10 @@ BookController.post("/create", async (req, res, cb) => {
 BookController.get("/", async (req, res) => {
     const bookid = req.query.bookId  
     try {
+        if(!bookid){
+            return res.status(400).json({ result: false, message: "yêu cầu phải có trường bookId"})
+        }
+
         const book = new Book();
         await book.init(bookid);
         res.status(200).json({ result: true, message: "tìm kiếm sách thông qua ID thành công", Book: book })
@@ -57,6 +65,10 @@ BookController.get("/Genre", async (req, res) => {
     const page = req.query.page || 1
     
     try {
+        if(!genre){
+            return res.status(400).json({ result: false, message: "yêu cầu phải có trường genre"})
+        }
+
         const result = await Book.findByGenre(genre, page)
         res.status(200).json({ result: true, message: `tìm kiếm sách thông qua thể loại: ${genre} thành công`, Book: result })
     } catch (err) {
@@ -69,6 +81,10 @@ BookController.post("/Genre", async (req, res) => {
     const page = req.query.page || 1
     
     try {
+        if(!genre){
+            return res.status(400).json({ result: false, message: "yêu cầu phải có trường genre"})
+        }
+
         const result = await Book.findByMultiGene(genre, page)
         res.status(200).json({ result: true, message: `tìm kiếm sách thông qua thể loại: ${genre} thành công`, Book: result })
     } catch (err) {
@@ -95,6 +111,10 @@ BookController.post("/search", async (req, res) => {
     const search = req.body.search
     const page = req.query.page || 1;
     try {
+        if(!search){
+            return res.status(400).json({ result: false, message: "yêu cầu phải có trường search"})
+        }
+        
         const result = await Book.findBySearchName(search, page)
         res.status(200).json({ result: true, message: "tìm kiếm sách thông qua tên thành công", Book: result })
     } catch (err) {

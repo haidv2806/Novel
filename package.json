@@ -7,8 +7,7 @@
   "scripts": {
     "test:coverage": "nyc mocha --require @babel/register --exit 'Test/**/*.test.js'",
     "test": "mocha --timeout 30000 --require @babel/register --exit 'Test/**/*.test.js'",
-    "start": "nodemon index.js",
-    "sass": "sass public/scss:public/assets/css -w"
+    "start": "nodemon --watch index.js --watch Service --watch routes --inspect --trace-warnings --exitcrash index.js"
   },
   "nyc": {
     "all": true,

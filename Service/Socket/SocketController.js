@@ -9,6 +9,9 @@ SocketController.post("/like", passport.authenticate('jwt', { session: false, op
         try {
             const socketID = req.body.socketID     
             const userID = req.user.user_id
+            if(!socketID){
+                return res.status(400).json({ result: false, message: "thiếu truong socketID"});
+            }
 
             const result = await Socket.addLike(socketID, userID)
 
@@ -33,6 +36,9 @@ SocketController.get("/room", passport.authenticate('jwt', { session: false, opt
             const roomID = req.query.roomID
             const page = req.query.page || 1
             const userID = req.user.user_id
+            if(!roomID){
+                return res.status(400).json({ result: false, message: "thiếu truong roomID"});
+            }
 
             const result = await Socket.getChatInRoom(roomID, page, userID)
 

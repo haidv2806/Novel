@@ -12,10 +12,12 @@ InteractionController.post("/interaction", passport.authenticate('jwt', { sessio
             const value = req.body.value ? req.body.value : "";
 
             if(!type){
-                res.status(400).json({ result: false, message: `yêu cầu phải có trạng thái tương tác`});
-            } else if (!book_id) {
-                res.status(400).json({ result: false, message: `yêu cầu phải có id của sách được tương tác`});
+                return res.status(400).json({ result: false, message: `yêu cầu phải có trạng thái tương tác`});
             }
+            if (!book_id) {
+                return res.status(400).json({ result: false, message: `yêu cầu phải có id của sách được tương tác`});
+            }
+
             const result = await User.updateUserInteraction(book_id, req.user.user_id, type, value)
 
             res.status(200).json({ result: true, message: `trạng thái tương tác ${type} được cập nhật`, user: result });
@@ -40,6 +42,9 @@ InteractionController.get("/isFollow", passport.authenticate('jwt', { session: f
     async (req, res, cb) => {
         try {
             const book_id = req.query.bookId
+            if(!book_id){
+                return res.status(400).json({ result: false, message: "thiếu truong bookId"});
+            }
             const result = await User.isUserFollowBook(book_id, req.user.user_id)
             let isFollow = false
 
@@ -61,6 +66,10 @@ InteractionController.get("/isRated", passport.authenticate('jwt', { session: fa
     async (req, res, cb) => {
         try {
             const book_id = req.query.bookId
+            if(!book_id){
+                return res.status(400).json({ result: false, message: "thiếu truong bookId"});
+            }
+
             const result = await User.isUserRatedBook(book_id, req.user.user_id)
             let isRated = false
 

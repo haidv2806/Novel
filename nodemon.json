@@ -1,0 +1,11 @@
+{
+    "watch": ["Service", "index.js", "routes/"], 
+    "delay": 2, 
+    "restartable": "rs",
+    "ext": "js,json",
+    "exec": "node --trace-warnings index.js",
+    "ignore": ["node_modules"],
+    "execMap": {
+        "js": "node --trace-warnings"
+    }
+}
