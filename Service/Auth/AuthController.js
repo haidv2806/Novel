@@ -31,39 +31,35 @@ Auth.post("/sign_in", async (req, res, cb) => {
 //   "password": string
 // }
 
-Auth.post("/sign_up", async (req, res, cb) => {
-  const name = req.body.name;
-  const email = req.body.email;
-  const password = req.body.password;
+Auth.post("/sign_up", async (req, res) => {
+  const { name, email, password } = req.body;
+
   try {
-    if (!name) {
-      return res.status(400).json({ result: false, message: "Tên người dùng không được để trống." });
-    }
-    if (!email) {
-      return res.status(400).json({ result: false, message: "Email người dùng không được để trống." });
-    }
-    if (!password) {
-      return res.status(400).json({ result: false, message: "Mật khẩu người dùng không được để trống." });
-    }
-
-    // kiểm tra xem email đã được dùng chưa
-    const checkEmail = await User.findByEmail(email)
-
-    if (checkEmail) {
-      return res.status(401).json({ result: false, message: "Email đã tồn tại, vui lòng đăng nhập." });
-
-    } else {
-      bcrypt.hash(password, 10, async (err, hash) => {
-        if (err) {
-          return res.status(500).json({ result: false, message: "Lỗi khi mã hóa mật khẩu.", error: err });
-        } else {
-          const result = await User.create(email, hash, name)
-          return res.status(201).json({ result: true, message: "Đăng ký thành công!", user: result })
-        }
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        result: false,
+        message: "Tên, email, hoặc mật khẩu không được để trống.",
       });
     }
+
+    const checkEmail = await User.findByEmail(email);
+
+    if (checkEmail) {
+      return res.status(401).json({
+        result: false,
+        message: "Email đã tồn tại, vui lòng đăng nhập.",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const result = await User.create(email, hashedPassword, name);
+    return res.status(201).json({ result: true, message: "Đăng ký thành công!", user: result });
   } catch (err) {
-    return res.status(500).json({ result: false, message: "đăng ký không thành công", error: err.message });
+    return res.status(500).json({
+      result: false,
+      message: "Đăng ký không thành công.",
+      error: err.message,
+    });
   }
 });
 
@@ -74,6 +70,36 @@ Auth.post("/sign_up", async (req, res, cb) => {
 //   "email": string,
 //   "password": string
 // }
+
+// Route để khởi động quá trình Google OAuth
+Auth.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+// Route callback sau khi Google xác thực thành công
+Auth.get(
+  "/google/callback",
+  (req, res, next) => {
+    passport.authenticate("google", (err, user, token, info) => {
+
+      if (err) {
+        return res.status(500).json({ result: false, message: "Xác thực thất bại", error: err.message });
+      }
+      if (!user) {
+        return res.status(401).json({ result: false, message: "Xác thực thất bại, vui lòng thử lại." });
+      }
+
+      res.status(200).json({
+        result: true,
+        message: "Đăng nhập bằng Google thành công",
+        token,
+        user,
+      });
+    })(req, res, next);
+  }
+);
+
 
 // Route xử lý yêu cầu gia hạn token
 Auth.post(

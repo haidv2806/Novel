@@ -7,7 +7,8 @@
   "scripts": {
     "test:coverage": "nyc mocha --require @babel/register --exit 'Test/**/*.test.js'",
     "test": "mocha --timeout 30000 --require @babel/register --exit 'Test/**/*.test.js'",
-    "start": "nodemon --watch index.js --watch Service --watch routes --inspect --trace-warnings --exitcrash index.js"
+    "start": "nodemon index.js",
+    "startSever": "nodemon --watch index.js --watch Service --watch routes --inspect --trace-warnings --exitcrash index.js"
   },
   "nyc": {
     "all": true,
@@ -62,6 +63,7 @@
     "passport": "^0.7.0",
     "passport-auth-token": "^1.0.1",
     "passport-google-oauth2": "^0.2.0",
+    "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",

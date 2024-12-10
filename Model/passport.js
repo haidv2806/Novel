@@ -1,13 +1,13 @@
 import bcrypt from "bcrypt";
 import passport from "passport";
 import { Strategy } from "passport-local";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
+import jwt from "jsonwebtoken";
+import env from "dotenv";
 
 import User from "./Person/User.js";
-import RefreshToken from './RefreshToken.js'
-
-import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
-import jwt from 'jsonwebtoken';
-import env from "dotenv";
+import RefreshToken from './RefreshToken.js';
 
 env.config();
 const secretOrKey = process.env.SECRET_AUTH_TOKEN_KEY
@@ -45,13 +45,67 @@ passport.use(
           return cb(null, false, { message: 'Sai mật khẩu' });
         }
       } else {
-        return cb(null, false, { message: 'Không tồn tại người dùng' })
+        return cb(null, false , null, { message: 'Không tồn tại người dùng' })
       }
 
     } catch (err) {
       console.log(err);
     }
   })
+);
+
+// đăng nhập bằng google
+passport.use(
+  "google",
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: `http://localhost:3000/Auth/google/callback`,
+    },
+    async (accessToken, refreshToken, profile, cb) => {
+      try {
+        const email = profile.emails[0].value;
+
+        const result = await User.findByEmail(email);
+        if (!result) {
+          const newUser = await User.create(
+            email,
+            "google", // Set mặc định cho tài khoản Google
+            profile.displayName
+          );
+
+          const refreshToken = await refreshTokenGenerate(newUser.user_id)
+          const accessToken = await accessTokenGenerate(newUser)
+
+          await RefreshToken.create(refreshToken, newUser.user_id)
+
+          const token = {
+            refreshToken: refreshToken,
+            accessToken: accessToken,
+          }
+
+          console.log("Tạo tài khoản Google thành công!");
+          return cb(null, newUser, token);
+        } else {
+          const refreshToken = await refreshTokenGenerate(result.user_id)
+          const accessToken = await accessTokenGenerate(result)
+
+          await RefreshToken.create(refreshToken, result.user_id)
+
+          const token = {
+            refreshToken: refreshToken,
+            accessToken: accessToken,
+          }
+
+          return cb(null, result, token);
+        }
+      } catch (err) {
+        console.error("Google OAuth error:", err);
+        return cb(err);
+      }
+    }
+  )
 );
 
 passport.use(
