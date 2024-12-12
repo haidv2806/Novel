@@ -85,7 +85,7 @@ class User {
 
     static async findByEmail(email) {
         const query = `
-            SELECT user_id, email
+            SELECT user_id, email, user_name
             FROM users
             WHERE email = $1;
         `

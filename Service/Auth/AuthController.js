@@ -78,24 +78,40 @@ Auth.get(
 );
 
 // Route callback sau khi Google xác thực thành công
+// Auth.get(
+//   "/google/callback",
+//   (req, res, next) => {
+//     passport.authenticate(  passport.authenticate("google"),(err, user, token, info) => {
+
+//       if (err) {
+//         return res.status(500).json({ result: false, message: "Xác thực thất bại", error: err.message });
+//       }
+//       if (!user) {
+//         return res.status(401).json({ result: false, message: "Xác thực thất bại, vui lòng thử lại." });
+//       }
+
+//       res.status(200).json({
+//         result: true,
+//         message: "Đăng nhập bằng Google thành công",
+//         token,
+//         user,
+//       });
+//     })(req, res, next);
+//   }
+// );
+
 Auth.get(
   "/google/callback",
   (req, res, next) => {
-    passport.authenticate("google", (err, user, token, info) => {
-
-      if (err) {
-        return res.status(500).json({ result: false, message: "Xác thực thất bại", error: err.message });
+    passport.authenticate("google", { session: false }, (err, user,token, info) => {
+      if (err || !user) {
+        return res.redirect("http://localhost:4000/login");
       }
-      if (!user) {
-        return res.status(401).json({ result: false, message: "Xác thực thất bại, vui lòng thử lại." });
-      }
-
-      res.status(200).json({
-        result: true,
-        message: "Đăng nhập bằng Google thành công",
-        token,
-        user,
-      });
+      const email = user.email 
+      const userName = user.user_name
+      
+      // Redirect với token kèm theo
+      res.redirect(`http://localhost:4000/?email=${email}&userName=${userName}`);
     })(req, res, next);
   }
 );
@@ -136,5 +152,14 @@ Auth.post(
 // {
 //   "refreshToken": <token>
 // }
+
+Auth.get("/protected", passport.authenticate('jwt', { session: false, optional: false }),
+    async (req, res, cb) => {
+      try {
+            res.status(200).json({ result: true, message: 'đăng nhập thành công', user: req.user });
+        } catch (err) {
+            return res.status(500).json({ result: false, message: "đăng nhập không thành công", error: err.message })
+        }
+    });
 
 export default Auth
