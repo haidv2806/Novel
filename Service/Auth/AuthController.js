@@ -105,13 +105,14 @@ Auth.get(
   (req, res, next) => {
     passport.authenticate("google", { session: false }, (err, user,token, info) => {
       if (err || !user) {
-        return res.redirect("http://localhost:4000/login");
+        return res.redirect("http://localhost:4000");
       }
       const email = user.email 
       const userName = user.user_name
-      
+      const accessToken = token.accessToken
+
       // Redirect với token kèm theo
-      res.redirect(`http://localhost:4000/?email=${email}&userName=${userName}`);
+      res.redirect(`http://localhost:4000/?email=${email}&userName=${userName}&token=${accessToken}`);
     })(req, res, next);
   }
 );

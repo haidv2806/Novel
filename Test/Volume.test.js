@@ -166,75 +166,75 @@ describe("Volume Class testing", () => {
 
 
 // describe("Volume Class - init method", () => {
-    //     let queryStub;
-    //     let chapterStub;
-    //     let findByIdStub;
+//         let queryStub;
+//         let chapterStub;
+//         let findByIdStub;
     
-    //     beforeEach(() => {
-    //         // Giả lập các phương thức truy vấn của db
-    //         queryStub = sinon.stub(db, "query");
-    //         chapterStub = sinon.stub(Chapter, "findByVolumeId");
-    //         findByIdStub = sinon.stub(Volume, "findById")
-    //     });
+//         beforeEach(() => {
+//             // Giả lập các phương thức truy vấn của db
+//             queryStub = sinon.stub(db, "query");
+//             chapterStub = sinon.stub(Chapter, "findByVolumeId");
+//             findByIdStub = sinon.stub(Volume, "findById")
+//         });
     
-    //     afterEach(() => {
-    //         // Khôi phục lại các phương thức sau mỗi test
-    //         queryStub.restore();
-    //         chapterStub.restore();
-    //         findByIdStub.restore()
-    //     });
+//         afterEach(() => {
+//             // Khôi phục lại các phương thức sau mỗi test
+//             queryStub.restore();
+//             chapterStub.restore();
+//             findByIdStub.restore()
+//         });
     
-    //     it("should initialize volume and its chapters", async () => {
-    //         const mockVolume = {
-    //             volume_id: volume_id,
-    //             volume_name: volume_name,
-    //             book_id: book_id,
-    //             volume_number: volume_number,
-    //             created_at: new Date(),
-    //         };
+//         it("should initialize volume and its chapters", async () => {
+//             const mockVolume = {
+//                 volume_id: volume_id,
+//                 volume_name: volume_name,
+//                 book_id: book_id,
+//                 volume_number: volume_number,
+//                 created_at: new Date(),
+//             };
     
-    //         // Giả lập phương thức findById của Volume trả về volume
-    //         findByIdStub.resolves(mockVolume);
+//             // Giả lập phương thức findById của Volume trả về volume
+//             findByIdStub.resolves(mockVolume);
     
-    //         const mockChapters = [
-    //             { chapter_id: 1, chapter_name: 'Chapter 1', chapter_number: 1, content: 'Content 1', volume_id: volume_id, book_id: book_id },
-    //             { chapter_id: 2, chapter_name: 'Chapter 2', chapter_number: 2, content: 'Content 2', volume_id: volume_id, book_id: book_id },
-    //         ];
+//             const mockChapters = [
+//                 { chapter_id: 1, chapter_name: 'Chapter 1', chapter_number: 1, content: 'Content 1', volume_id: volume_id, book_id: book_id },
+//                 { chapter_id: 2, chapter_name: 'Chapter 2', chapter_number: 2, content: 'Content 2', volume_id: volume_id, book_id: book_id },
+//             ];
     
-    //         // Giả lập phương thức chapterStub của Chapter trả về các chapters
-    //         chapterStub.resolves(mockChapters);
+//             // Giả lập phương thức chapterStub của Chapter trả về các chapters
+//             chapterStub.resolves(mockChapters);
     
-    //         const volume = new Volume();
-    //         await volume.init(volume_id);
+//             const volume = new Volume();
+//             await volume.init(volume_id);
     
-    //         // Kiểm tra các thuộc tính của volume
-    //         expect(volume.volume_id).to.equal(volume_id);
-    //         expect(volume.volume_name).to.equal(volume_name);
-    //         expect(volume.created_at).to.not.be.undefined;
-    //         expect(volume.chapters.length).to.equal(2); // Kiểm tra số lượng chapter
+//             // Kiểm tra các thuộc tính của volume
+//             expect(volume.volume_id).to.equal(volume_id);
+//             expect(volume.volume_name).to.equal(volume_name);
+//             expect(volume.created_at).to.not.be.undefined;
+//             expect(volume.chapters.length).to.equal(2); // Kiểm tra số lượng chapter
     
-    //         // Kiểm tra chapter 1
-    //         expect(volume.chapters[0].chapter_id).to.equal(mockChapters[0].chapter_id);
-    //         expect(volume.chapters[0].chapter_name).to.equal(mockChapters[0].chapter_name);
+//             // Kiểm tra chapter 1
+//             expect(volume.chapters[0].chapter_id).to.equal(mockChapters[0].chapter_id);
+//             expect(volume.chapters[0].chapter_name).to.equal(mockChapters[0].chapter_name);
     
-    //         // Kiểm tra xem các phương thức findById và findByVolumeId đã được gọi đúng cách
-    //         expect(findByIdStub.calledOnceWith(volume_id)).to.be.true;
-    //         expect(chapterStub.calledOnceWith(volume_id)).to.be.true;
-    //     });
+//             // Kiểm tra xem các phương thức findById và findByVolumeId đã được gọi đúng cách
+//             expect(findByIdStub.calledOnceWith(volume_id)).to.be.true;
+//             expect(chapterStub.calledOnceWith(volume_id)).to.be.true;
+//         });
     
-    //     it("should throw error when volume not found", async () => {
-    //         const volumeID = 1;
+//         it("should throw error when volume not found", async () => {
+//             const volumeID = 1;
     
-    //         // Mô phỏng kết quả trả về khi không tìm thấy volume
-    //         queryStub.resolves({ rows: [] });
+//             // Mô phỏng kết quả trả về khi không tìm thấy volume
+//             queryStub.resolves({ rows: [] });
     
-    //         const volume = new Volume();
+//             const volume = new Volume();
     
-    //         // Kiểm tra xem khi không tìm thấy volume thì có ném lỗi đúng không
-    //         await expect(volume.init(volumeID)).to.be.rejectedWith("Volume not found");
+//             // Kiểm tra xem khi không tìm thấy volume thì có ném lỗi đúng không
+//             await expect(volume.init(volumeID)).to.be.rejectedWith("Volume not found");
     
-    //         // Kiểm tra gọi db.query đúng cách
-    //         expect(queryStub.calledOnce).to.be.true;
-    //         expect(chapterStub.notCalled).to.be.true; // Nếu không tìm thấy volume thì không gọi Chapter.findByVolumeId
-    //     });
-    // });
+//             // Kiểm tra gọi db.query đúng cách
+//             expect(queryStub.calledOnce).to.be.true;
+//             expect(chapterStub.notCalled).to.be.true; // Nếu không tìm thấy volume thì không gọi Chapter.findByVolumeId
+//         });
+//     });
